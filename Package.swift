@@ -5,6 +5,9 @@ import PackageDescription
 
 let package = Package(
     name: "Botter",
+    platforms: [
+        .macOS(.v10_15)
+    ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
@@ -12,15 +15,24 @@ let package = Package(
             targets: ["Botter"]),
     ],
     dependencies: [
-        // Dependencies declare other packages that this package depends on.
-        // .package(url: /* package url */, from: "1.0.0"),
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.9.0"),
+        .package(url: "https://github.com/givip/Telegrammer.git", .branch("develop")),
+        .package(url: "https://github.com/givip/telegrammer-vapor-middleware.git", .branch("develop")),
+        .package(path: "./Vkontakter"),
+        .package(path: "./vkontakter-vapor-middleware")
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "Botter",
-            dependencies: []),
+            dependencies: [
+                .product(name: "Vapor", package: "vapor"),
+                .product(name: "Telegrammer", package: "Telegrammer"),
+                .product(name: "Vkontakter", package: "Vkontakter"),
+                .product(name: "TelegrammerMiddleware", package: "telegrammer-vapor-middleware"),
+                .product(name: "VkontakterMiddleware", package: "vkontakter-vapor-middleware")
+            ]),
         .testTarget(
             name: "BotterTests",
             dependencies: ["Botter"]),
