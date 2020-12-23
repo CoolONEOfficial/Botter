@@ -9,7 +9,7 @@ import Foundation
 import Vkontakter
 import Telegrammer
 
-public final class Message {
+public struct Message {
     public let text: String?
     public let fromId: Int64?
     

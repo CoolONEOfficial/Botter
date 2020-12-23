@@ -11,14 +11,3 @@ public enum Platform<Tg, Vk> {
     case tg(Tg)
     case vk(Vk)
 }
-
-public extension Platform {
-    var void: Platform<Void?, Void?> {
-        switch self {
-        case .tg(_):
-            return .tg(nil)
-        case .vk(_):
-            return .vk(nil)
-        }
-    }
-}

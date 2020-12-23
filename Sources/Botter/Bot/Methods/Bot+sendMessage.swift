@@ -10,7 +10,7 @@ import Vkontakter
 import Foundation
 
 public extension Message {
-    convenience init(params: Vkontakter.Bot.SendMessageParams, resp: Vkontakter.Bot.SendMessageResp) {
+    init(params: Vkontakter.Bot.SendMessageParams, resp: Vkontakter.Bot.SendMessageResp) {
         let respItem = resp.items.first!
         self.init(from: Vkontakter.Message(id: respItem.messageId, date: UInt64(Date().timeIntervalSince1970), peerId: respItem.peerId, fromId: nil, text: params.message, randomId: params.randomId != nil ? .init(params.randomId!) : nil, attachments: [], geo: nil, payload: params.payload, keyboard: .init(), fwdMessages: params.forwardMessages?.map { Vkontakter.Message(id: $0) } ?? [], replyMessage: nil, action: nil, adminAuthorId: nil, conversationMessageId: nil, isCropped: nil, membersCount: nil, updateTime: nil, wasListened: nil, pinnedAt: nil))
     }
@@ -19,30 +19,34 @@ public extension Message {
 public extension Bot {
     
     /// Parameters container struct for `sendMessage` method
-    struct SendMessageParams: JSONEncodable {
+    struct SendMessageParams<T: Encodable> {
 
         /// Идентификатор пользователя, которому отправляется сообщение.
         let peerId: Int64
 
         /// Текст личного сообщения. Обязательный параметр, если не задан параметр attachment.
         let message: String
+        
+        /// Объект, описывающий клавиатуру бота.
+        let keyboard: Keyboard<T>?
 
-        public init(peerId: Int64, message: String) {
+        public init(peerId: Int64, message: String, keyboard: Keyboard<T>? = nil) {
             self.peerId = peerId
             self.message = message
+            self.keyboard = keyboard
         }
     
         var tg: Telegrammer.Bot.SendMessageParams {
-            .init(chatId: .chat(peerId), text: message)
+            .init(chatId: .chat(peerId), text: message, replyMarkup: keyboard?.tg)
         }
 
         var vk: Vkontakter.Bot.SendMessageParams {
-            .init(randomId: .random(), peerId: peerId, message: message)
+            .init(randomId: .random(), peerId: peerId, message: message, keyboard: keyboard?.vk)
         }
     }
 
     @discardableResult
-    func sendMessage(params: SendMessageParams, platform: Platform<Void?, Void?>) throws -> Future<Message>? {
+    func sendMessage<T1, T2, T3>(params: SendMessageParams<T3>, platform: Platform<T1, T2>) throws -> Future<Message>? {
         switch platform {
         case .vk:
             return try vk?.sendMessage(params: params.vk).map { .init(params: params.vk, resp: $0) }

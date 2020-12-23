@@ -15,7 +15,7 @@ extension JSONDecoder {
     }()
 }
 
-extension JSONEncoder {
+public extension JSONEncoder {
     static var snakeCased: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .convertToSnakeCase

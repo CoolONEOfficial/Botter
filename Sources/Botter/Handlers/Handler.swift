@@ -40,7 +40,6 @@ extension Handler {
         case let .vk(vk):
             return self.vk.check(update: vk)
         }
-
     }
     
     public func handle(update: Update, dispatcher: Dispatcher) {

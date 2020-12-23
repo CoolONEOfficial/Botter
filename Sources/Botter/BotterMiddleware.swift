@@ -80,7 +80,9 @@ public extension BotterMiddleware {
         debugPrint("Request to \(request.url.path)...")
         return middlewares.map { $0.respond(to: request, chainingTo: FailResponder.shared) }
             .flatten(on: request.eventLoop)
-            .map { $0.first { $0.body.count > 0 } ?? .init() }
+            .map { res in
+                return res.first { $0.body.count > 0 }!
+            }
     }
 
     func setWebhooks(_ serverName: String?, _ eventLoop: EventLoop) throws -> EventLoopFuture<Bool> {
@@ -89,4 +91,3 @@ public extension BotterMiddleware {
         return futures.flatten(on: eventLoop).map { results in results.allSatisfy { $0 } }
     }
 }
-
