@@ -20,6 +20,7 @@ let package = Package(
         .package(url: "https://github.com/givip/telegrammer-vapor-middleware.git", .branch("develop")),
         .package(path: "./Vkontakter"),
         .package(path: "./vkontakter-vapor-middleware")
+        .package(url: "https://github.com/Flight-School/AnyCodable", from: "0.4.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -32,6 +33,7 @@ let package = Package(
                 .product(name: "Vkontakter", package: "Vkontakter"),
                 .product(name: "TelegrammerMiddleware", package: "telegrammer-vapor-middleware"),
                 .product(name: "VkontakterMiddleware", package: "vkontakter-vapor-middleware")
+                .product(name: "AnyCodable", package: "AnyCodable"),
             ]),
         .testTarget(
             name: "BotterTests",
