@@ -18,8 +18,10 @@ public struct MessageEvent: PlatformObject {
     public let platform: Platform<Tg, Vk>
     
     //public let message: Message?
+    public let id: String
     public let data: AnyCodable
-    public let peerId: Int64
+    public let peerId: Int64?
+    public let userId: Int64
     
     init?(from tg: Tg) {
         platform = .tg(tg)
@@ -29,7 +31,9 @@ public struct MessageEvent: PlatformObject {
 //        } else {
 //            self.message = nil
 //        }
-        peerId = tg.from.id
+        id = tg.id
+        peerId = nil
+        userId = tg.from.id
         guard let data = tg.data else { return nil }
         self.data = .init(data)
 //        text = tg.text
@@ -39,7 +43,9 @@ public struct MessageEvent: PlatformObject {
     init?(from vk: Vk) {
         platform = .vk(vk)
         
+        id = vk.eventId
         peerId = vk.peerId
+        userId = vk.userId
         guard let data = vk.payload else { return nil }
         self.data = data
 //        text = vk.text

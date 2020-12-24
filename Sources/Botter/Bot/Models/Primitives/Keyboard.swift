@@ -9,7 +9,7 @@ import Foundation
 import Telegrammer
 import Vkontakter
 
-public struct Keyboard<T: Encodable> {
+public struct Keyboard {
 
     ///
     public let oneTime: Bool
@@ -35,13 +35,13 @@ public struct Keyboard<T: Encodable> {
             }
             
             public struct App {
-                public let appId: Int
+                public let appId: Int64
                 
-                public let ownerId: Int?
+                public let ownerId: Int64?
                 
                 public let hash: String
 
-                public init(appId: Int, ownerId: Int? = nil, hash: String) {
+                public init(appId: Int64, ownerId: Int64? = nil, hash: String) {
                     self.appId = appId
                     self.ownerId = ownerId
                     self.hash = hash
@@ -85,7 +85,7 @@ public struct Keyboard<T: Encodable> {
         public let text: String
         
         ///
-        public let data: T?
+        public let data: String?
         
         let encoder: JSONEncoder
         
@@ -93,7 +93,7 @@ public struct Keyboard<T: Encodable> {
             try? String(data: encoder.encode(data), encoding: .utf8)
         }
 
-        public init(text: String, action: Action, color: Vkontakter.Keyboard.Button.Color? = nil, data: T? = nil, dataEncoder: JSONEncoder = .snakeCased) {
+        public init(text: String, action: Action, color: Vkontakter.Keyboard.Button.Color? = nil, data: String? = nil, dataEncoder: JSONEncoder = .snakeCased) {
             self.text = text
             self.action = action
             self.color = color

@@ -19,7 +19,7 @@ public extension Message {
 public extension Bot {
     
     /// Parameters container struct for `sendMessage` method
-    struct SendMessageParams<T: Encodable> {
+    struct SendMessageParams {
 
         /// Идентификатор пользователя, которому отправляется сообщение.
         let peerId: Int64
@@ -28,9 +28,9 @@ public extension Bot {
         let message: String
         
         /// Объект, описывающий клавиатуру бота.
-        let keyboard: Keyboard<T>?
+        let keyboard: Keyboard?
 
-        public init(peerId: Int64, message: String, keyboard: Keyboard<T>? = nil) {
+        public init(peerId: Int64, message: String, keyboard: Keyboard? = nil) {
             self.peerId = peerId
             self.message = message
             self.keyboard = keyboard
@@ -46,7 +46,7 @@ public extension Bot {
     }
 
     @discardableResult
-    func sendMessage<T1, T2, T3>(params: SendMessageParams<T3>, platform: Platform<T1, T2>) throws -> Future<Message>? {
+    func sendMessage<Tg, Vk>(params: SendMessageParams, platform: Platform<Tg, Vk>) throws -> Future<Message>? {
         switch platform {
         case .vk:
             return try vk?.sendMessage(params: params.vk).map { .init(params: params.vk, resp: $0) }
