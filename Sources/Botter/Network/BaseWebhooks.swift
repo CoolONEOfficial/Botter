@@ -11,9 +11,17 @@ import Telegrammer
 import Vapor
 
 protocol BaseWebhooks {
-    func start() throws -> EventLoopFuture<Void>
+    func start(vkServerName: String?) throws -> EventLoopFuture<Void>
     func stop() throws -> EventLoopFuture<Void>
 }
 
-extension Vkontakter.Webhooks: BaseWebhooks {}
-extension Telegrammer.Webhooks: BaseWebhooks {}
+extension Vkontakter.Webhooks: BaseWebhooks {
+    func start(vkServerName: String?) throws -> EventLoopFuture<Void> {
+        try start(serverName: vkServerName)
+    }
+}
+extension Telegrammer.Webhooks: BaseWebhooks {
+    func start(vkServerName: String?) throws -> EventLoopFuture<Void> {
+        try start()
+    }
+}

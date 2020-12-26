@@ -34,7 +34,7 @@ public class Dispatcher {
     
     public func enqueue(bytebuffer: ByteBuffer) {
         for dispatcher in dispatchers {
-            dispatcher.enqueue(bytebuffer: bytebuffer)
+            dispatcher.enqueue(bytebuffer)
         }
     }
 }

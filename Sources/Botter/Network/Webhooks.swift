@@ -36,8 +36,8 @@ public class Webhooks: Connection {
         webhooks = ([ tg, vk ] as [BaseWebhooks?]).compactMap { $0 }
     }
 
-    public func start() throws -> EventLoopFuture<Void> {
-        try webhooks.map { try $0.start() }.flatten(on: worker.next())
+    public func start(vkServerName: String?) throws -> EventLoopFuture<Void> {
+        try webhooks.map { try $0.start(vkServerName: vkServerName) }.flatten(on: worker.next())
     }
 
     public func stop() throws -> EventLoopFuture<Void> {

@@ -16,28 +16,25 @@ public struct MessageEvent: PlatformObject {
     public typealias Vk = Vkontakter.MessageEvent
     
     public let platform: Platform<Tg, Vk>
-    
-    //public let message: Message?
+
     public let id: String
     public let data: AnyCodable
     public let peerId: Int64?
     public let userId: Int64
     
+    public func decodeData<T: Decodable>(decoder: JSONDecoder = .snakeCased) throws -> T {
+        try decoder.decode(T.self, from: JSONSerialization.data(withJSONObject: data.value))
+    }
+    
     init?(from tg: Tg) {
         platform = .tg(tg)
-        
-//        if let message = tg.message {
-//            self.message = .init(from: message)
-//        } else {
-//            self.message = nil
-//        }
+
         id = tg.id
         peerId = nil
         userId = tg.from.id
-        guard let data = tg.data else { return nil }
-        self.data = .init(data)
-//        text = tg.text
-//        fromId = tg.from?.id ?? tg.chat.id
+        guard let data = tg.data?.data(using: .utf8),
+              let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) else { return nil }
+        self.data = .init(jsonObject)
     }
 
     init?(from vk: Vk) {
@@ -48,14 +45,5 @@ public struct MessageEvent: PlatformObject {
         userId = vk.userId
         guard let data = vk.payload else { return nil }
         self.data = data
-//        text = vk.text
-//        fromId = vk.fromId
     }
 }
-
-//extension Message {
-//    init(from event: Vkontakter.MessageEvent) {
-//        fromId = event.peerId
-//        text = event.
-//    }
-//}

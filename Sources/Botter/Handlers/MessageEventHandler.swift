@@ -17,12 +17,12 @@ public class MessageEventHandler: Handler {
     
     public lazy var vk: Vkontakter.Handler = Vkontakter.MessageEventHandler(name: name) { update, context throws in
         guard let update = Update(from: update) else { return }
-        try! self.callback(update, nil)
+        try self.callback(update, nil)
     }
     
-    public lazy var tg: Telegrammer.Handler = TgSimpleCallbackQueryHandler(name: name) { update, context in
+    public lazy var tg: Telegrammer.Handler = TgSimpleCallbackQueryHandler(name: name) { update, context throws in
         guard let update = Update(from: update) else { return }
-        try! self.callback(update, nil)
+        try self.callback(update, nil)
     }
 
     public init(

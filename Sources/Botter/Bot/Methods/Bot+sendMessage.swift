@@ -12,7 +12,7 @@ import Foundation
 public extension Message {
     init(params: Vkontakter.Bot.SendMessageParams, resp: Vkontakter.Bot.SendMessageResp) {
         let respItem = resp.items.first!
-        self.init(from: Vkontakter.Message(id: respItem.messageId, date: UInt64(Date().timeIntervalSince1970), peerId: respItem.peerId, fromId: nil, text: params.message, randomId: params.randomId != nil ? .init(params.randomId!) : nil, attachments: [], geo: nil, payload: params.payload, keyboard: .init(), fwdMessages: params.forwardMessages?.map { Vkontakter.Message(id: $0) } ?? [], replyMessage: nil, action: nil, adminAuthorId: nil, conversationMessageId: nil, isCropped: nil, membersCount: nil, updateTime: nil, wasListened: nil, pinnedAt: nil))
+        self.init(from: Vkontakter.Message(id: respItem.messageId, date: UInt64(Date().timeIntervalSince1970), peerId: respItem.peerId, fromId: nil, text: params.message, randomId: params.randomId != nil ? .init(params.randomId!) : nil, attachments: [], geo: nil, payload: params.payload, keyboard: params.keyboard, fwdMessages: params.forwardMessages?.map { Vkontakter.Message(id: $0) } ?? [], replyMessage: nil, action: nil, adminAuthorId: nil, conversationMessageId: nil, isCropped: nil, membersCount: nil, updateTime: nil, wasListened: nil, pinnedAt: nil))
     }
 }
 

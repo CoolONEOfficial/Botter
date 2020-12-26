@@ -8,6 +8,7 @@
 import Foundation
 import Telegrammer
 import Vkontakter
+import AnyCodable
 
 public struct Keyboard {
 
@@ -56,21 +57,21 @@ public struct Keyboard {
             case callback
 
             func vk(parent: Button) -> Vkontakter.Keyboard.Button.Action {
-                let encodedData = parent.encodedData
+                let data = parent.payload?.description
                 
                 switch self {
                 case .text:
-                    return .text(.init(payload: encodedData, label: parent.text))
+                    return .text(.init(payload: data, label: parent.text))
                 case let .link(linkValue):
-                    return .link(.init(payload: encodedData, label: parent.text, link: linkValue.link))
+                    return .link(.init(payload: data, label: parent.text, link: linkValue.link))
                 case .location:
-                    return .location(.init(payload: encodedData))
+                    return .location(.init(payload: data))
                 case let .pay(payValue):
-                    return .pay(.init(payload: encodedData, hash: payValue.hash))
+                    return .pay(.init(payload: data, hash: payValue.hash))
                 case let .app(appValue):
-                    return .app(.init(payload: encodedData, label: parent.text, appId: appValue.appId, ownerId: appValue.ownerId, hash: appValue.hash))
+                    return .app(.init(payload: data, label: parent.text, appId: appValue.appId, ownerId: appValue.ownerId, hash: appValue.hash))
                 case .callback:
-                    return .callback(.init(payload: encodedData, label: parent.text))
+                    return .callback(.init(payload: data, label: parent.text))
                 }
             }
         }
@@ -85,30 +86,27 @@ public struct Keyboard {
         public let text: String
         
         ///
-        public let data: String?
+        public let payload: AnyCodable?
         
-        let encoder: JSONEncoder
-        
-        var encodedData: String? {
-            try? String(data: encoder.encode(data), encoding: .utf8)
+        public init<T: Encodable>(text: String, action: Action, color: Vkontakter.Keyboard.Button.Color? = nil, data: T? = nil, dataEncoder: JSONEncoder = .snakeCased) throws {
+            let test = String(data: try dataEncoder.encode(data), encoding: .utf8)!
+            self.init(text: text, action: action, color: color, payload: .init(test))
         }
 
-        public init(text: String, action: Action, color: Vkontakter.Keyboard.Button.Color? = nil, data: String? = nil, dataEncoder: JSONEncoder = .snakeCased) {
+        public init(text: String, action: Action, color: Vkontakter.Keyboard.Button.Color? = nil, payload: AnyCodable? = nil) {
             self.text = text
             self.action = action
             self.color = color
-            self.data = data
-            encoder = dataEncoder
+            self.payload = payload
         }
-        
+
         var inlineTg: Telegrammer.InlineKeyboardButton? {
-            let encodedData = self.encodedData
             switch action {
             case .text:
                 log.warning(.init(stringLiteral: "Telegram doesn't support text inline keyboard button!"))
                 return nil
             case let .link(linkValue):
-                return .init(text: text, url: linkValue.link, callbackData: encodedData)
+                return .init(text: text, url: linkValue.link, callbackData: payload?.description)
             case .location:
                 log.warning(.init(stringLiteral: "Telegram doesn't support location inline keyboard button!"))
                 return nil
@@ -117,7 +115,7 @@ public struct Keyboard {
             case .app(_):
                 return .init(text: text) // TODO: callbackGame: CallbackGame()
             case .callback:
-                return .init(text: text, callbackData: encodedData)
+                return .init(text: text, callbackData: payload?.description)
             }
         }
         
