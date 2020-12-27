@@ -6,18 +6,10 @@
 //
 
 import Foundation
+import Vkontakter
+import Telegrammer
 
-/// Messages which contains command entity
-//public struct CommandFilter: Filter {
-//
-//    public var name: String = "command"
-//
-//    public func filter(message: Message) -> Bool {
-//        guard let entity = message.entities else { return false }
-//        return entity.contains(where: { $0.type == .botCommand })
-//    }
-//}
-//
-//public extension Filters {
-//    static var command = Filters(filter: CommandFilter())
-//}
+/// Messages which contains command
+public extension Filters {
+    static var command = Filters(vk: Vkontakter.Filters.command, tg: Telegrammer.Filters.command)
+}

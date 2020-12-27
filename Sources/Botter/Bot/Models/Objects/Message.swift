@@ -13,6 +13,8 @@ public struct Message {
     public let text: String?
     public let fromId: Int64?
     
+    public let command: String?
+    
     public let platform: Platform<Telegrammer.Message, Vkontakter.Message>
     
     init(from tg: Telegrammer.Message) {
@@ -20,6 +22,13 @@ public struct Message {
         
         text = tg.text
         fromId = tg.from?.id ?? tg.chat.id
+        if let entity = tg.entities?.first(where: { $0.type == .botCommand }), let text = text {
+            let startIndex = text.index(text.startIndex, offsetBy: entity.offset + 1) // remove "/"
+            let endIndex = text.index(startIndex, offsetBy: entity.length - 1)
+            command = .init(text[startIndex ..< endIndex])
+        } else {
+            command = nil
+        }
     }
 
     init(from vk: Vkontakter.Message) {
@@ -27,5 +36,6 @@ public struct Message {
         
         text = vk.text
         fromId = vk.fromId
+        command = vk.payload?.command?.rawValue
     }
 }
