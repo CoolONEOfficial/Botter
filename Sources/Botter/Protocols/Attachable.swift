@@ -21,3 +21,9 @@ extension Vkontakter.Attachable {
         .init(attachmentId: attachmentId)
     }
 }
+
+extension Photo: Attachable {}
+
+extension Document: Attachable {}
+
+// TODO: other kinds

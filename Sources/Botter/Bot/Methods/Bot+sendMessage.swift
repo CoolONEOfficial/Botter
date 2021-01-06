@@ -133,6 +133,28 @@ public extension Bot {
             .init(chatId: .chat(peerId), photo: content.tg, caption: message, parseMode: nil, disableNotification: nil, replyToMessageId: nil, replyMarkup: keyboard?.tg)
         }
         
+        func tgGroup(_ content: [FileInfo]) -> Telegrammer.Bot.SendMediaGroupParams {
+            .init(chatId: .chat(peerId), media: content.compactMap { (_ attachment: FileInfo) -> InputMediaPhotoAndVideo? in
+                if case .file = attachment.content {
+                    debugPrint("files in groups not impletemnted yet")
+                    return nil
+                }
+                guard let mediaData = try? JSONEncoder().encode(attachment.content.tg),
+                      var media = String(data: mediaData, encoding: .utf8)?.trimmingCharacters(in: ["\""])
+                else { return nil }
+                media.removeAll(where: { $0 == "\\" })
+                
+                switch attachment.type {
+                case .photo:
+                    return .inputMediaPhoto(.init(type: "photo", media: media, caption: message, parseMode: nil))
+                default:
+                    return nil
+//                case .document://////
+//                    return .inputMediaVideo(.init(type: "video", media: attachment.content.tg, caption: message, parseMode: nil))
+                }
+            })
+        }
+        
         func tgDocument(_ content: FileInfo.Content) -> Telegrammer.Bot.SendDocumentParams {
             .init(chatId: .chat(peerId), document: content.tg, caption: message, parseMode: nil, disableNotification: nil, replyToMessageId: nil, replyMarkup: keyboard?.tg)
         }
@@ -147,7 +169,6 @@ public extension Bot {
     func sendMessage<Tg, Vk>(params: SendMessageParams, platform: Platform<Tg, Vk>, eventLoop: EventLoop) throws -> Future<Message>? {
         switch platform {
         case .vk:
-            
             if let attachments = params.attachments, !attachments.isEmpty {
                 
                 var params = params
@@ -206,7 +227,7 @@ public extension Bot {
                     }
                     return future
                 } else {
-                    // TODO: send media group
+                    return try tg.sendMediaGroup(params: params.tgGroup(attachments)).map { Message(from: $0.first!)! }
                 }
             }
             
