@@ -6,18 +6,10 @@
 //
 
 import Foundation
+import Vkontakter
+import Telegrammer
 
-/// Messages that contain `[PhotoSize]`
-//public struct PhotoFilter: Filter {
-//
-//    public var name: String = "photo"
-//
-//    public func filter(message: Message) -> Bool {
-//        guard let photos = message.photo else { return false }
-//        return !photos.isEmpty
-//    }
-//}
-//
-//public extension Filters {
-//    static var photo = Filters(filter: PhotoFilter())
-//}
+/// Filters messages to allow only those which contains photo
+public extension Filters {
+    static var photo = Filters(vk: Vkontakter.Filters.photo, tg: Telegrammer.Filters.photo)
+}

@@ -8,6 +8,7 @@
 import Foundation
 import Vkontakter
 import Telegrammer
+import Vapor
 
 public protocol BotContext {}
 

@@ -9,15 +9,21 @@ import Foundation
 import Vkontakter
 import Telegrammer
 
-public struct Message {
+public struct Message: PlatformObject {
+    
+    public typealias Tg = Telegrammer.Message
+    public typealias Vk = Vkontakter.Message
+    
     public let text: String?
     public let fromId: Int64?
     
     public let command: String?
     
+    public let attachments: [Attachment]
+    
     public let platform: Platform<Telegrammer.Message, Vkontakter.Message>
     
-    init(from tg: Telegrammer.Message) {
+    init?(from tg: Tg) {
         platform = .tg(tg)
         
         text = tg.text
@@ -29,13 +35,19 @@ public struct Message {
         } else {
             command = nil
         }
+        attachments = tg.botterAttachments
     }
 
-    init(from vk: Vkontakter.Message) {
+    init?(from vk: Vk) {
         platform = .vk(vk)
         
         text = vk.text
         fromId = vk.fromId
-        command = vk.payload?.command?.rawValue
+        if case let .input(command) = vk.payload {
+            self.command = command?.rawValue
+        } else {
+            command = nil
+        }
+        attachments = vk.attachments?.botterAttachments ?? []
     }
 }

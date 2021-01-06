@@ -6,17 +6,11 @@
 //
 
 import Foundation
+import Telegrammer
+import Vkontakter
 
-/// Messages that contain `Document`
-//public struct DocumentFilter: Filter {
-//
-//    public var name: String = "document"
-//
-//    public func filter(message: Message) -> Bool {
-//        return message.document != nil
-//    }
-//}
-//
-//public extension Filters {
-//    static var document = Filters(filter: DocumentFilter())
-//}
+/// Filters messages to allow only those which contains document
+public extension Filters {
+    static var document = Filters(vk: Vkontakter.Filters.document, tg: Telegrammer.Filters.document)
+}
+

@@ -30,7 +30,7 @@ public struct Update: PlatformObject {
         platform = .vk(vk)
         switch object {
         case let .message(message):
-            content = .message(.init(from: message.message))
+            content = .message(Message(from: message.message)!)
         case let .event(event):
             guard let event = MessageEvent(from: event) else { return nil }
             content = .event(event)
@@ -45,7 +45,7 @@ public struct Update: PlatformObject {
         secret = nil
         
         if let message = tg.message {
-            content = .message(.init(from: message))
+            content = .message(Message(from: message)!)
         } else if let callbackQuery = tg.callbackQuery {
             guard let event = MessageEvent(from: callbackQuery) else { return nil }
             content = .event(event)
