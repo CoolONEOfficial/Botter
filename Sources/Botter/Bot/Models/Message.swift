@@ -44,7 +44,7 @@ public struct Message: PlatformObject {
         text = vk.text
         fromId = vk.fromId
         if case let .input(command) = vk.payload {
-            self.command = command?.rawValue
+            self.command = command
         } else {
             command = nil
         }

@@ -1,0 +1,7 @@
+sources:
+    - Sources/Botter/
+    - Tests/
+templates:
+    - Templates/
+output:
+    Sources/Botter/Generated/

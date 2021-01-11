@@ -8,17 +8,27 @@
 import Foundation
 import Vkontakter
 
-public protocol Attachable {
+public protocol Attachable: Codable {
     var attachmentId: String { get }
 }
 
-struct BotterAttachable: Attachable {
-    let attachmentId: String
+extension Attachable {
+    var object: BotterAttachable {
+        .init(attachmentId)
+    }
+}
+
+public struct BotterAttachable: Attachable {
+    public let attachmentId: String
+    
+    public init(_ attachmentId: String) {
+        self.attachmentId = attachmentId
+    }
 }
 
 extension Vkontakter.Attachable {
     var botterAttachable: BotterAttachable {
-        .init(attachmentId: attachmentId)
+        .init(attachmentId)
     }
 }
 

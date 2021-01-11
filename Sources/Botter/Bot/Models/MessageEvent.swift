@@ -20,7 +20,7 @@ public struct MessageEvent: PlatformObject {
     public let id: String
     public let data: AnyCodable
     public let peerId: Int64?
-    public let userId: Int64
+    public let fromId: Int64?
     
     public func decodeData<T: Decodable>(decoder: JSONDecoder = .snakeCased) throws -> T {
         try decoder.decode(T.self, from: JSONSerialization.data(withJSONObject: data.value))
@@ -31,7 +31,7 @@ public struct MessageEvent: PlatformObject {
 
         id = tg.id
         peerId = nil
-        userId = tg.from.id
+        fromId = tg.from.id
         guard let data = tg.data?.data(using: .utf8),
               let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) else { return nil }
         self.data = .init(jsonObject)
@@ -42,7 +42,7 @@ public struct MessageEvent: PlatformObject {
         
         id = vk.eventId
         peerId = vk.peerId
-        userId = vk.userId
+        fromId = vk.userId
         guard let data = vk.payload else { return nil }
         self.data = data
     }

@@ -9,7 +9,7 @@ import Foundation
 import Telegrammer
 import Vkontakter
 
-public enum Attachment {
+public enum Attachment: AutoCodable {
     case photo(Photo)
     case document(Document)
 }

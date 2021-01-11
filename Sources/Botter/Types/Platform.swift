@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum Platform<Tg, Vk> {
+public enum Platform<Tg: Codable, Vk: Codable>: AutoCodable {
     case tg(Tg)
     case vk(Vk)
 }

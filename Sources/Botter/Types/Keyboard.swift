@@ -10,13 +10,13 @@ import Telegrammer
 import Vkontakter
 import AnyCodable
 
-public struct Keyboard {
+public struct Keyboard: Codable {
 
     ///
     public let oneTime: Bool
     
     ///
-    public let buttons: [[Button]]
+    public var buttons: [[Button]]
     
     ///
     public let inline: Bool

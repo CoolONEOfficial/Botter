@@ -10,11 +10,11 @@ import Telegrammer
 import Vkontakter
 import AnyCodable
 
-public struct Button {
+public struct Button: Codable {
     
-    public enum Action {
+    public enum Action: AutoCodable {
         
-        public struct Link {
+        public struct Link: Codable {
             public let link: String
             
             public init(link: String) {
@@ -22,7 +22,7 @@ public struct Button {
             }
         }
 
-        public struct Pay {
+        public struct Pay: Codable {
             public let hash: String
 
             public init(hash: String) {
@@ -30,7 +30,7 @@ public struct Button {
             }
         }
         
-        public struct App {
+        public struct App: Codable {
             public let appId: Int64
             
             public let ownerId: Int64?
@@ -81,14 +81,16 @@ public struct Button {
     public let text: String
     
     ///
-    public let payload: AnyCodable?
+    public let payload: String?
     
     public init<T: Encodable>(text: String, action: Action, color: Vkontakter.Button.Color? = nil, data: T? = nil, dataEncoder: JSONEncoder = .snakeCased) throws {
-        let test = String(data: try dataEncoder.encode(data), encoding: .utf8)!
-        self.init(text: text, action: action, color: color, payload: .init(test))
+        self.init(text: text, action: action, color: color, payload: String(data: try dataEncoder.encode(data), encoding: .utf8)!)
     }
 
-    public init(text: String, action: Action, color: Vkontakter.Button.Color? = nil, payload: AnyCodable? = nil) {
+    public init(text: String, action: Action, color: Vkontakter.Button.Color? = nil, payload: String? = nil) {
+        if let payload = payload, payload.count > 64 {
+            log.warning(.init(stringLiteral: "Telegram doesn't support payload >64 bytes!"))
+        }
         self.text = text
         self.action = action
         self.color = color
@@ -110,7 +112,7 @@ public struct Button {
         case .app(_):
             return .init(text: text) // TODO: callbackGame: CallbackGame()
         case .callback:
-            return .init(text: text, callbackData: payload?.description)
+            return .init(text: text, callbackData: payload)
         }
     }
     
@@ -138,4 +140,6 @@ public struct Button {
     var vk: Vkontakter.Button? {
         .init(action: action.vk(parent: self), color: color)
     }
+    
+    
 }

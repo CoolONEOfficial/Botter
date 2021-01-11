@@ -10,6 +10,10 @@ import Vkontakter
 import Telegrammer
 
 public struct HandlerGroup: Hashable {
+    public init(id: UInt, name: String) {
+        self.init(vk: .init(id: id, name: name), tg: .init(id: id, name: name))
+    }
+    
     public init(vk: Vkontakter.HandlerGroup, tg: Telegrammer.HandlerGroup) {
         self.vk = vk
         self.tg = tg

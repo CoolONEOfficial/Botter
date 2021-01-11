@@ -15,11 +15,11 @@ public extension Bot {
     struct SendMessageEventAnswerParams {
 
         /// Идентификатор события
-        let eventId: String
+        var eventId: String?
         
-        let userId: Int64
+        var userId: Int64?
         
-        let peerId: Int64?
+        var peerId: Int64?
         
         public enum `Type` {
             case notification(text: String, isAlert: Bool? = nil)
@@ -37,7 +37,8 @@ public extension Bot {
         
         let type: Type
     
-        var tg: Telegrammer.Bot.AnswerCallbackQueryParams {
+        var tg: Telegrammer.Bot.AnswerCallbackQueryParams? {
+            guard let eventId = eventId else { return nil }
             switch type {
             case let .notification(text, isAlert):
                 return .init(callbackQueryId: eventId, text: text, showAlert: isAlert, url: nil, cacheTime: nil)
@@ -47,22 +48,27 @@ public extension Bot {
         }
 
         var vk: Vkontakter.Bot.SendMessageEventAnswerParams? {
-            guard let peerId = peerId else {
-                log.warning("peerId is needed for sendMessageEventAnswer for VK")
+            guard let peerId = peerId, let eventId = eventId, let userId = userId else {
+                log.warning("peerId, eventId and userId is needed for sendMessageEventAnswer for VK")
                 return nil
             }
             return .init(eventId: eventId, userId: userId, peerId: peerId, eventData: type.vk)
         }
         
-        public init(eventId: String, userId: Int64, peerId: Int64?, type: Bot.SendMessageEventAnswerParams.`Type`) {
-            self.eventId = eventId
-            self.userId = userId
-            self.peerId = peerId
-            self.type = type
+        var event: MessageEvent? {
+            get {
+                nil
+            }
+            set {
+                self.eventId = newValue?.id
+                self.userId = newValue?.fromId
+                self.peerId = newValue?.peerId
+            }
         }
         
-        public init(event: MessageEvent, type: Bot.SendMessageEventAnswerParams.`Type`) {
-            self.init(eventId: event.id, userId: event.userId, peerId: event.peerId, type: type)
+        public init(event: MessageEvent? = nil, type: Bot.SendMessageEventAnswerParams.`Type`) {
+            self.type = type
+            self.event = event
         }
     }
 
@@ -73,7 +79,8 @@ public extension Bot {
             guard let paramsVk = params.vk else { return nil }
             return try vk?.sendMessageEventAnswer(params: paramsVk).map { $0.bool }
         case .tg:
-            return try tg?.answerCallbackQuery(params: params.tg)
+            guard let paramsTg = params.tg else { return nil }
+            return try tg?.answerCallbackQuery(params: paramsTg)
         }
     }
 }

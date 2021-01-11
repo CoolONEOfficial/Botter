@@ -16,7 +16,7 @@ struct TgSimpleCallbackQueryHandler: Telegrammer.Handler {
     let callback: Telegrammer.HandlerCallback
 
     public func check(update: Telegrammer.Update) -> Bool {
-        update.callbackQuery != nil
+        update.callbackQuery?.data != nil
     }
 
     public func handle(update: Telegrammer.Update, dispatcher: Telegrammer.Dispatcher) {

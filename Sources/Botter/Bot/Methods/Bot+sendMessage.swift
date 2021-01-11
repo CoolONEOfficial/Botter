@@ -9,6 +9,7 @@ import Telegrammer
 import Vkontakter
 import Foundation
 import NIO
+import Vapor
 
 public extension Message {
     init?(params: Vkontakter.Bot.SendMessageParams, resp: Vkontakter.Bot.SendMessageResp) {
@@ -33,10 +34,10 @@ extension Vkontakter.Bot.SavedDoc {
     }
 }
 
-public struct FileInfo {
+public struct FileInfo: Codable {
 
     ///
-    public enum `Type` {
+    public enum `Type`: AutoCodable {
         case photo
         case document
     }
@@ -44,8 +45,8 @@ public struct FileInfo {
     public let type: `Type`
     
     ///
-    public enum Content {
-        case fileId(Attachable)
+    public enum Content: AutoCodable {
+        case fileId(BotterAttachable)
         case url(String)
         case file(InputFile)
         
@@ -81,7 +82,7 @@ public struct FileInfo {
     }
 }
 
-public struct InputFile {
+public struct InputFile: Codable {
 
     let data: Data
     let filename: String
@@ -103,21 +104,21 @@ public struct InputFile {
 public extension Bot {
     
     /// Parameters container struct for `sendMessage` method
-    struct SendMessageParams {
+    class SendMessageParams: Codable {
 
         /// Идентификатор пользователя, которому отправляется сообщение.
-        let peerId: Int64
+        public var peerId: Int64?
 
         /// Текст личного сообщения.
-        let message: String?
+        public var message: String?
         
         /// Объект, описывающий клавиатуру бота.
-        let keyboard: Keyboard?
+        public var keyboard: Keyboard?
         
         /// Вложения прикрепленные к сообщению.
-        var attachments: [FileInfo]?
+        public var attachments: [FileInfo]?
 
-        public init(peerId: Int64, message: String? = nil, keyboard: Keyboard? = nil, attachments: [FileInfo]? = nil) {
+        public init(peerId: Int64? = nil, message: String? = nil, keyboard: Keyboard? = nil, attachments: [FileInfo]? = nil) {
             assert(message != nil || attachments != nil)
             self.peerId = peerId
             self.message = message
@@ -126,15 +127,15 @@ public extension Bot {
         }
         
         func tgMessage(_ content: String) -> Telegrammer.Bot.SendMessageParams {
-            .init(chatId: .chat(peerId), text: content, replyMarkup: keyboard?.tg)
+            .init(chatId: .chat(peerId!), text: content, replyMarkup: keyboard?.tg)
         }
         
         func tgPhoto(_ content: FileInfo.Content) -> Telegrammer.Bot.SendPhotoParams {
-            .init(chatId: .chat(peerId), photo: content.tg, caption: message, parseMode: nil, disableNotification: nil, replyToMessageId: nil, replyMarkup: keyboard?.tg)
+            .init(chatId: .chat(peerId!), photo: content.tg, caption: message, parseMode: nil, disableNotification: nil, replyToMessageId: nil, replyMarkup: keyboard?.tg)
         }
         
         func tgGroup(_ content: [FileInfo]) -> Telegrammer.Bot.SendMediaGroupParams {
-            .init(chatId: .chat(peerId), media: content.compactMap { (_ attachment: FileInfo) -> InputMediaPhotoAndVideo? in
+            .init(chatId: .chat(peerId!), media: content.compactMap { (_ attachment: FileInfo) -> InputMediaPhotoAndVideo? in
                 if case .file = attachment.content {
                     debugPrint("files in groups not impletemnted yet")
                     return nil
@@ -156,7 +157,7 @@ public extension Bot {
         }
         
         func tgDocument(_ content: FileInfo.Content) -> Telegrammer.Bot.SendDocumentParams {
-            .init(chatId: .chat(peerId), document: content.tg, caption: message, parseMode: nil, disableNotification: nil, replyToMessageId: nil, replyMarkup: keyboard?.tg)
+            .init(chatId: .chat(peerId!), document: content.tg, caption: message, parseMode: nil, disableNotification: nil, replyToMessageId: nil, replyMarkup: keyboard?.tg)
         }
 
         var vk: Vkontakter.Bot.SendMessageParams {
@@ -166,7 +167,7 @@ public extension Bot {
     }
 
     @discardableResult
-    func sendMessage<Tg, Vk>(params: SendMessageParams, platform: Platform<Tg, Vk>, eventLoop: EventLoop) throws -> Future<Message>? {
+    func sendMessage<Tg, Vk>(params: SendMessageParams, platform: Platform<Tg, Vk>, app: Application) throws -> Future<Message>? {
         switch platform {
         case .vk:
             if let attachments = params.attachments, !attachments.isEmpty {
@@ -193,7 +194,7 @@ public extension Bot {
                     case .photo:
                         uploadFuture = try vk?.upload(vkFile, as: .photo, for: .message)
                     case .document:
-                        uploadFuture = try vk?.upload(vkFile, as: .doc(peerId: params.peerId), for: .message)
+                        uploadFuture = try vk?.upload(vkFile, as: .doc(peerId: params.peerId!), for: .message)
                     }
 
                     guard let uploadSingleFuture = uploadFuture?.map({ res in res.first! }) else { return nil }
@@ -206,7 +207,7 @@ public extension Bot {
                     return uploadSingleFuture
                 }
                 
-                return futures.flatten(on: eventLoop).flatMap { attachments in
+                return futures.flatten(on: app.eventLoopGroup.next()).flatMap { attachments in
                     try! self.vk!.sendMessage(params: params.vk).map { Message(params: params.vk, resp: $0)! }
                 }
             }

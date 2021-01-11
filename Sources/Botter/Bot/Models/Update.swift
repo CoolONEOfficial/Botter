@@ -13,7 +13,7 @@ public struct Update: PlatformObject {
     public typealias Tg = Telegrammer.Update
     public typealias Vk = Vkontakter.Update
     
-    public enum Content {
+    public enum Content: AutoCodable {
         case message(Message)
         case event(MessageEvent)
     }
@@ -29,11 +29,15 @@ public struct Update: PlatformObject {
         
         platform = .vk(vk)
         switch object {
-        case let .message(message):
-            content = .message(Message(from: message.message)!)
+        case let .messageWrapper(wrapper):
+            guard let message = Message(from: wrapper.message) else { return nil }
+            content = .message(message)
         case let .event(event):
             guard let event = MessageEvent(from: event) else { return nil }
             content = .event(event)
+        case let .message(message):
+            guard let message = Message(from: message) else { return nil }
+            content = .message(message)
         }
         secret = vk.secret
     }

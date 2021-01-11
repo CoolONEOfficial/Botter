@@ -9,7 +9,7 @@ import Foundation
 import Telegrammer
 import Vkontakter
 
-public struct Document: PlatformObject {
+public struct Document: PlatformObject, Codable {
     
     public typealias Tg = Telegrammer.Document
     public typealias Vk = Vkontakter.Doc
