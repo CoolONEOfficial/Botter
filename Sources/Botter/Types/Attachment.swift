@@ -30,9 +30,9 @@ extension Telegrammer.Message {
     }
 }
 
-extension Vkontakter.Attachments {
+extension Vkontakter.ArrayByComma where Element == Vkontakter.Attachment {
     var botterAttachments: [Attachment] {
-        attachments.compactMap { attachment in
+        array.compactMap { attachment in
             switch attachment {
             case let .photo(photoValue):
                 guard let photo = Photo(from: photoValue) else { return nil }

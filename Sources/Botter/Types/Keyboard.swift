@@ -21,17 +21,21 @@ public struct Keyboard: Codable {
     ///
     public let inline: Bool
     
-    public init(oneTime: Bool, buttons: [[Button]], inline: Bool) {
+    public init(oneTime: Bool = false, inline: Bool = true, buttons: [[Button]]) {
         self.oneTime = oneTime
         self.buttons = buttons
         self.inline = inline
     }
     
+    var tgInline: Telegrammer.InlineKeyboardMarkup {
+        .init(
+            inlineKeyboard: buttonsFor(\.inlineTg)
+        )
+    }
+    
     var tg: Telegrammer.ReplyMarkup {
         inline
-            ? .inlineKeyboardMarkup(.init(
-                inlineKeyboard: buttonsFor(\.inlineTg)
-            ))
+            ? .inlineKeyboardMarkup(tgInline)
             : .replyKeyboardMarkup(.init(
                 keyboard: buttonsFor(\.tg),
                 resizeKeyboard: true,
@@ -48,5 +52,13 @@ public struct Keyboard: Codable {
 private extension Keyboard {
     func buttonsFor<T>(_ transform: (Button) -> T?) -> [[T]] {
         buttons.map { $0.compactMap(transform) }
+    }
+}
+
+extension Keyboard: ExpressibleByArrayLiteral {
+    public typealias ArrayLiteralElement = [Button]
+    
+    public init(arrayLiteral elements: ArrayLiteralElement...) {
+        self.init(buttons: elements)
     }
 }

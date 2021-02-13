@@ -9,11 +9,8 @@ import Foundation
 import Telegrammer
 import Vkontakter
 
-public struct Photo: PlatformObject {
-    
-    public typealias Tg = Telegrammer.PhotoSize
-    public typealias Vk = Vkontakter.Photo
-    
+public struct Photo {
+
     public let platform: Platform<Tg, Vk>
 
     /// Идентификатор фотографии.
@@ -21,6 +18,13 @@ public struct Photo: PlatformObject {
     
     public let sizes: [Size]
 
+}
+
+extension Photo: PlatformObject {
+    
+    public typealias Tg = Telegrammer.PhotoSize
+    public typealias Vk = Vkontakter.Photo
+    
     init?(from tg: Tg) {
         platform = .tg(tg)
 
@@ -34,7 +38,7 @@ public struct Photo: PlatformObject {
         attachmentId = vk.attachmentId
         sizes = vk.sizes?.compactMap { Size(from: $0) } ?? []
     }
-
+    
 }
 
 public extension Photo {

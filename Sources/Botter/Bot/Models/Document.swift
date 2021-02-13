@@ -9,10 +9,7 @@ import Foundation
 import Telegrammer
 import Vkontakter
 
-public struct Document: PlatformObject, Codable {
-    
-    public typealias Tg = Telegrammer.Document
-    public typealias Vk = Vkontakter.Doc
+public struct Document: Codable {
     
     public let platform: Platform<Tg, Vk>
     
@@ -31,6 +28,13 @@ public struct Document: PlatformObject, Codable {
     /// Optional. File size
     public var size: Int64?
 
+}
+
+extension Document: PlatformObject {
+
+    public typealias Tg = Telegrammer.Document
+    public typealias Vk = Vkontakter.Doc
+    
     init?(from tg: Tg) {
         platform = .tg(tg)
 
@@ -55,4 +59,5 @@ public struct Document: PlatformObject, Codable {
         size = vk.size
         
     }
+    
 }

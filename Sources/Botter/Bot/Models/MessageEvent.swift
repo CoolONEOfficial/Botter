@@ -10,27 +10,34 @@ import Vkontakter
 import Telegrammer
 import AnyCodable
 
-public struct MessageEvent: PlatformObject {
-    
-    public typealias Tg = Telegrammer.CallbackQuery
-    public typealias Vk = Vkontakter.MessageEvent
-    
-    public let platform: Platform<Tg, Vk>
+public struct MessageEvent {
 
     public let id: String
+
     public let data: AnyCodable
-    public let peerId: Int64?
-    public let fromId: Int64?
-    
+
+    public var peerId: Int64?
+
+    public var fromId: Int64?
+
+    public let platform: Platform<Tg, Vk>
+
     public func decodeData<T: Decodable>(decoder: JSONDecoder = .snakeCased) throws -> T {
         try decoder.decode(T.self, from: JSONSerialization.data(withJSONObject: data.value))
     }
+
+}
+
+extension MessageEvent: PlatformObject {
+    
+    public typealias Tg = Telegrammer.CallbackQuery
+    public typealias Vk = Vkontakter.MessageEvent
     
     init?(from tg: Tg) {
         platform = .tg(tg)
 
         id = tg.id
-        peerId = nil
+        peerId = tg.from.id
         fromId = tg.from.id
         guard let data = tg.data?.data(using: .utf8),
               let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) else { return nil }
@@ -46,4 +53,5 @@ public struct MessageEvent: PlatformObject {
         guard let data = vk.payload else { return nil }
         self.data = data
     }
+    
 }

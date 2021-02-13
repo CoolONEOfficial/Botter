@@ -76,11 +76,12 @@ public extension Bot {
     func sendMessageEventAnswer<Tg, Vk>(params: SendMessageEventAnswerParams, platform: Platform<Tg, Vk>) throws -> Future<Bool>? {
         switch platform {
         case .vk:
-            guard let paramsVk = params.vk else { return nil }
-            return try vk?.sendMessageEventAnswer(params: paramsVk).map { $0.bool }
+            guard let vk = vk, let paramsVk = params.vk else { return nil }
+            return try vk.sendMessageEventAnswer(params: paramsVk).map { $0.bool }
+
         case .tg:
-            guard let paramsTg = params.tg else { return nil }
-            return try tg?.answerCallbackQuery(params: paramsTg)
+            guard let tg = tg, let paramsTg = params.tg else { return nil }
+            return try tg.answerCallbackQuery(params: paramsTg)
         }
     }
 }
