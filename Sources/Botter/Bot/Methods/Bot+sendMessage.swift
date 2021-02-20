@@ -37,10 +37,10 @@ public extension Bot {
     /// Parameters container struct for `sendMessage` method
     class SendMessageParams: Codable {
 
-        /// Идентификатор чата, которому отправляется сообщение.
+        /// Идентификатор чата, которому отправляется сообщение. (только для Tg)
         public var chatId: Int64?
         
-        ///
+        /// Идентификатор пользователя, которому отправляется сообщение. (для Vk или Tg)
         public var userId: Int64?
 
         /// Текст личного сообщения.

@@ -192,46 +192,6 @@ extension FileInfo.`Type` {
 
 }
 
-extension Platform {
-
-    enum CodingKeys: String, CodingKey {
-        case tg
-        case vk
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        if container.allKeys.contains(.tg), try container.decodeNil(forKey: .tg) == false {
-            var associatedValues = try container.nestedUnkeyedContainer(forKey: .tg)
-            let associatedValue0 = try associatedValues.decode(Tg.self)
-            self = .tg(associatedValue0)
-            return
-        }
-        if container.allKeys.contains(.vk), try container.decodeNil(forKey: .vk) == false {
-            var associatedValues = try container.nestedUnkeyedContainer(forKey: .vk)
-            let associatedValue0 = try associatedValues.decode(Vk.self)
-            self = .vk(associatedValue0)
-            return
-        }
-        throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown enum case"))
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        switch self {
-        case let .tg(associatedValue0):
-            var associatedValues = container.nestedUnkeyedContainer(forKey: .tg)
-            try associatedValues.encode(associatedValue0)
-        case let .vk(associatedValue0):
-            var associatedValues = container.nestedUnkeyedContainer(forKey: .vk)
-            try associatedValues.encode(associatedValue0)
-        }
-    }
-
-}
-
 extension Update.Content {
 
     enum CodingKeys: String, CodingKey {

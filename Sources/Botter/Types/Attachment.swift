@@ -14,6 +14,18 @@ public enum Attachment: AutoCodable {
     case document(Document)
 }
 
+public extension Attachment {
+    var attachmentId: String {
+        switch self {
+        case let .photo(photo):
+            return photo.attachmentId
+
+        case let .document(doc):
+            return doc.attachmentId
+        }
+    }
+}
+
 extension Telegrammer.Message {
     var botterAttachments: [Attachment] {
         var attachments = [Attachment]()
