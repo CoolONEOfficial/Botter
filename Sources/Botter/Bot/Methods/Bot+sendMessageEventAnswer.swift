@@ -11,6 +11,11 @@ import Foundation
 
 public extension Bot {
     
+    enum SendMessageEventAnserError: Error {
+        case botNotFound
+        case destinationNotFound
+    }
+    
     /// Parameters container struct for `sendMessageEventAnswer` method
     struct SendMessageEventAnswerParams {
 
@@ -37,8 +42,8 @@ public extension Bot {
         
         let type: Type
     
-        var tg: Telegrammer.Bot.AnswerCallbackQueryParams? {
-            guard let eventId = eventId else { return nil }
+        func tg() throws -> Telegrammer.Bot.AnswerCallbackQueryParams {
+            guard let eventId = eventId else { throw SendMessageEventAnserError.destinationNotFound }
             switch type {
             case let .notification(text, isAlert):
                 return .init(callbackQueryId: eventId, text: text, showAlert: isAlert, url: nil, cacheTime: nil)
@@ -47,10 +52,9 @@ public extension Bot {
             }
         }
 
-        var vk: Vkontakter.Bot.SendMessageEventAnswerParams? {
+        func vk() throws -> Vkontakter.Bot.SendMessageEventAnswerParams {
             guard let peerId = peerId, let eventId = eventId, let userId = userId else {
-                log.warning("peerId, eventId and userId is needed for sendMessageEventAnswer for VK")
-                return nil
+                throw SendMessageEventAnserError.destinationNotFound
             }
             return .init(eventId: eventId, userId: userId, peerId: peerId, eventData: type.vk)
         }
@@ -73,15 +77,15 @@ public extension Bot {
     }
 
     @discardableResult
-    func sendMessageEventAnswer<Tg, Vk>(params: SendMessageEventAnswerParams, platform: Platform<Tg, Vk>) throws -> Future<Bool>? {
+    func sendMessageEventAnswer<Tg, Vk>(params: SendMessageEventAnswerParams, platform: Platform<Tg, Vk>) throws -> Future<Bool> {
         switch platform {
         case .vk:
-            guard let vk = vk, let paramsVk = params.vk else { return nil }
-            return try vk.sendMessageEventAnswer(params: paramsVk).map { $0.bool }
+            guard let vk = vk else { throw SendMessageEventAnserError.botNotFound }
+            return try vk.sendMessageEventAnswer(params: try params.vk()).map { $0.bool }
 
         case .tg:
-            guard let tg = tg, let paramsTg = params.tg else { return nil }
-            return try tg.answerCallbackQuery(params: paramsTg)
+            guard let tg = tg else { throw SendMessageEventAnserError.botNotFound }
+            return try tg.answerCallbackQuery(params: try params.tg())
         }
     }
 }

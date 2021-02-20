@@ -16,9 +16,10 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", from: "4.9.0"),
-        .package(url: "https://github.com/givip/Telegrammer.git", .branch("develop")),
+        //.package(url: "https://github.com/givip/Telegrammer.git", .branch("develop")),
         .package(url: "https://github.com/givip/telegrammer-vapor-middleware.git", .branch("develop")),
         .package(path: "./Vkontakter"),
+        .package(path: "./Telegrammer"),
         .package(path: "./vkontakter-vapor-middleware"),
         .package(url: "https://github.com/Flight-School/AnyCodable", from: "0.4.0"),
     ],

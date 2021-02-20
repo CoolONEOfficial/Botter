@@ -22,7 +22,7 @@ extension Message: Replyable {
 }
 
 public extension Message {
-    func reply(from bot: Bot, params: Bot.SendMessageParams, app: Application) throws -> Future<Message>? {
+    func reply(from bot: Bot, params: Bot.SendMessageParams, app: Application) throws -> Future<Message> {
         try replyMessage(from: bot, params: params, app: app)
     }
 }
@@ -42,7 +42,7 @@ extension MessageEvent: Replyable {
 extension Bot.SendMessageParams: Replyable {}
 
 public extension MessageEvent {
-    func reply(from bot: Bot, params: Bot.SendMessageEventAnswerParams, app: Application) throws -> Future<Bool>? {
+    func reply(from bot: Bot, params: Bot.SendMessageEventAnswerParams, app: Application) throws -> Future<Bool> {
         var params = params
         params.event = self
         return try bot.sendMessageEventAnswer(params: params, platform: platform)
@@ -50,7 +50,7 @@ public extension MessageEvent {
 }
 
 public extension Replyable where Self: PlatformObject {
-    func replyMessage(from bot: Bot, params: Bot.SendMessageParams, app: Application) throws -> Future<Message>? {
+    func replyMessage(from bot: Bot, params: Bot.SendMessageParams, app: Application) throws -> Future<Message> {
         params.chatId = chatId
         params.userId = userId
         return try bot.sendMessage(params: params, platform: platform, app: app)

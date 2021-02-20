@@ -65,9 +65,9 @@ extension Message: PlatformObject {
     }
     
     init?(params: Vkontakter.Bot.SendMessageParams, resp: Vkontakter.Bot.SendMessageResp) {
-        guard let respItem = resp.items.first else { return nil }
+        guard case let .id(messageId) = resp else { return nil }
         self.init(from: Vkontakter.Message(
-            id: respItem.messageId, date: UInt64(Date().timeIntervalSince1970), peerId: respItem.peerId, fromId: nil,
+            id: messageId, date: UInt64(Date().timeIntervalSince1970), peerId: params.peerId, fromId: nil,
             text: params.message, randomId: params.randomId != nil ? .init(params.randomId!) : nil,
             attachments: params.attachment, geo: nil, payload: params.payload, keyboard: params.keyboard,
             fwdMessages: params.forwardMessages?.array.map { Vkontakter.Message(id: $0) } ?? [],

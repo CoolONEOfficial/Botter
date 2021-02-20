@@ -45,14 +45,19 @@ public struct FileInfo: Codable {
     }
     
     var vk: Vkontakter.Attachment? {
-        guard case let .fileId(attachable) = content else { return nil }
-        switch type {
-        case .photo:
-            guard let photo = Vkontakter.Photo(from: attachable.attachmentId) else { return nil }
-            return .photo(photo)
-        case .document:
-            guard let doc = Vkontakter.Doc(from: attachable.attachmentId) else { return nil }
-            return .doc(doc)
+        switch content {
+        case let .fileId(attachable):
+            switch type {
+            case .photo:
+                guard let photo = Vkontakter.Photo(from: attachable.attachmentId) else { return nil }
+                return .photo(photo)
+            case .document:
+                guard let doc = Vkontakter.Doc(from: attachable.attachmentId) else { return nil }
+                return .doc(doc)
+            }
+            
+        case .url, .file:
+            return nil
         }
     }
     
