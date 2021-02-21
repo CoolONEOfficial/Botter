@@ -6,10 +6,74 @@
 //
 
 import Foundation
+import AnyCodable
+
+public typealias AnyPlatform = Platform<AnyCodable, AnyCodable>
 
 public enum Platform<Tg: Codable, Vk: Codable> {
     case tg(Tg)
     case vk(Vk)
+}
+
+public extension AnyPlatform {
+    static let tg: Self = .tg(.init())
+    static let vk: Self = .vk(.init())
+}
+
+public extension Array where Element == AnyPlatform {
+    static let all: Self = [ .vk, .tg ]
+}
+
+public extension Platform {
+    func same<Tg, Vk>(_ platform: Platform<Tg, Vk>) -> Bool {
+        switch self {
+        case .tg:
+            if case .tg = platform {
+                return true
+            }
+        case .vk:
+            if case .vk = platform {
+                return true
+            }
+        }
+        return false
+    }
+}
+
+public extension Platform where Tg == Vk {
+    var value: Tg {
+        switch self {
+        case let .tg(tg):
+            return tg
+
+        case let .vk(vk):
+            return vk
+        }
+    }
+}
+
+extension Platform: Equatable where Tg: Equatable, Vk: Equatable {
+    public static func == (lhs: Platform<Tg, Vk>, rhs: Platform<Tg, Vk>) -> Bool {
+        switch lhs {
+        case let .tg(tg):
+            switch rhs {
+            case let .tg(innerTg):
+                return tg == innerTg
+            case .vk:
+                return false
+            }
+            
+        case let .vk(vk):
+            switch rhs {
+            case .tg:
+                return false
+            case let .vk(innerVk):
+                return vk == innerVk
+            }
+        }
+    }
+    
+    
 }
 
 public extension Platform {

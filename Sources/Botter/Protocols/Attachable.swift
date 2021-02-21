@@ -9,31 +9,51 @@ import Foundation
 import Vkontakter
 
 public protocol Attachable: Codable {
-    var attachmentId: String { get }
+    func attachmentId(for platform: AnyPlatform) -> String?
 }
 
 extension Attachable {
-    var object: BotterAttachable {
-        .init(attachmentId)
+    func object(for platform: AnyPlatform) -> BotterAttachable? {
+        guard let attachmentId = attachmentId(for: platform) else { return nil }
+        return .init(platform.to(attachmentId))
     }
 }
 
 public struct BotterAttachable: Attachable {
-    public let attachmentId: String
+    public typealias PlatformId = Platform<String, String>
     
-    public init(_ attachmentId: String) {
-        self.attachmentId = attachmentId
+    public let platformAttachmentIds: [PlatformId]
+    
+    public init(_ platformAttachmentIds: PlatformId...) {
+        self.init(platformAttachmentIds)
+    }
+    
+    public init(_ platformAttachmentIds: [PlatformId]) {
+        self.platformAttachmentIds = platformAttachmentIds
+    }
+
+    public func attachmentId(for platform: AnyPlatform) -> String? {
+        guard let platformAttachmentId = self.platformAttachmentIds.first(where: { $0.same(platform) }) else { return nil }
+        return platformAttachmentId.value
     }
 }
 
 extension Vkontakter.Attachable {
     var botterAttachable: BotterAttachable {
-        .init(attachmentId)
+        .init(.vk(attachmentId))
     }
 }
 
-extension Photo: Attachable {}
+extension Photo: Attachable {
+    public func attachmentId(for platform: AnyPlatform) -> String? {
+        attachmentId
+    }
+}
 
-extension Document: Attachable {}
+extension Document: Attachable {
+    public func attachmentId(for platform: AnyPlatform) -> String? {
+        attachmentId
+    }
+}
 
 // TODO: other kinds

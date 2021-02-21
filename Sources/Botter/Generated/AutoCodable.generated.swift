@@ -163,35 +163,6 @@ extension FileInfo.Content {
 
 }
 
-extension FileInfo.`Type` {
-
-    enum CodingKeys: String, CodingKey {
-        case photo
-        case document
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-
-        let enumCase = try container.decode(String.self)
-        switch enumCase {
-        case CodingKeys.photo.rawValue: self = .photo
-        case CodingKeys.document.rawValue: self = .document
-        default: throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown enum case '\(enumCase)'"))
-        }
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-
-        switch self {
-        case .photo: try container.encode(CodingKeys.photo.rawValue)
-        case .document: try container.encode(CodingKeys.document.rawValue)
-        }
-    }
-
-}
-
 extension Update.Content {
 
     enum CodingKeys: String, CodingKey {

@@ -12,7 +12,7 @@ import NIO
 import Vapor
 
 extension Vkontakter.Bot.SavedDoc {
-    var fileInfoType: FileInfo.`Type` {
+    var fileInfoType: FileInfoType {
         switch self {
         case .graffiti(_):
             fatalError()
@@ -32,6 +32,7 @@ public extension Bot {
         case botNotFound
         case destinationNotFound
         case textNotFound
+        case platformAttachmentIdNotFound
     }
     
     /// Parameters container struct for `sendMessage` method
@@ -68,16 +69,18 @@ public extension Bot {
             .init(chatId: .chat(chatId), text: content, replyMarkup: keyboard?.tg)
         }
         
-        func tgPhoto(chatId: Int64, _ content: FileInfo.Content) -> Telegrammer.Bot.SendPhotoParams {
-            .init(chatId: .chat(chatId), photo: content.tg, caption: text, parseMode: nil, disableNotification: nil, replyToMessageId: nil, replyMarkup: keyboard?.tg)
+        func tgPhoto(chatId: Int64, _ content: FileInfo.Content) throws -> Telegrammer.Bot.SendPhotoParams {
+            guard let photo = content.tg else { throw SendMessageError.platformAttachmentIdNotFound }
+            return .init(chatId: .chat(chatId), photo: photo, caption: text, parseMode: nil, disableNotification: nil, replyToMessageId: nil, replyMarkup: keyboard?.tg)
         }
         
         func tgGroup(chatId: Int64, _ content: [FileInfo]) -> Telegrammer.Bot.SendMediaGroupParams {
             .init(chatId: .chat(chatId), media: content.compactMap { $0.tgMedia(caption: text)?.photoAndVideo })
         }
         
-        func tgDocument(chatId: Int64, _ content: FileInfo.Content) -> Telegrammer.Bot.SendDocumentParams {
-            .init(chatId: .chat(chatId), document: content.tg, caption: text, parseMode: nil, disableNotification: nil, replyToMessageId: nil, replyMarkup: keyboard?.tg)
+        func tgDocument(chatId: Int64, _ content: FileInfo.Content) throws -> Telegrammer.Bot.SendDocumentParams {
+            guard let photo = content.tg else { throw SendMessageError.platformAttachmentIdNotFound }
+            return .init(chatId: .chat(chatId), document: photo, caption: text, parseMode: nil, disableNotification: nil, replyToMessageId: nil, replyMarkup: keyboard?.tg)
         }
 
         var vk: Vkontakter.Bot.SendMessageParams {
@@ -151,10 +154,10 @@ public extension Bot {
                     let future: Future<Message>
                     switch attachment.type {
                     case .photo:
-                        let params = params.tgPhoto(chatId: chatId, attachment.content)
+                        let params = try params.tgPhoto(chatId: chatId, attachment.content)
                         future = try tg.sendPhoto(params: params).map { Message(from: $0) }
                     case .document:
-                        let params = params.tgDocument(chatId: chatId, attachment.content)
+                        let params = try params.tgDocument(chatId: chatId, attachment.content)
                         future = try tg.sendDocument(params: params).map { Message(from: $0) }
                     }
                     return future

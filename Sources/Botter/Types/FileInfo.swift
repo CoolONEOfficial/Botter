@@ -9,15 +9,14 @@ import Foundation
 import Telegrammer
 import Vkontakter
 
+public enum FileInfoType: String, Codable {
+    case photo
+    case document
+}
+
 public struct FileInfo: Codable {
 
-    ///
-    public enum `Type`: AutoCodable {
-        case photo
-        case document
-    }
-
-    public let type: `Type`
+    public let type: FileInfoType
     
     ///
     public enum Content: AutoCodable {
@@ -25,10 +24,11 @@ public struct FileInfo: Codable {
         case url(String)
         case file(InputFile)
         
-        var tg: Telegrammer.FileInfo {
+        var tg: Telegrammer.FileInfo? {
             switch self {
             case let .fileId(attachable):
-                return .fileId(attachable.attachmentId)
+                guard let attachmentId = attachable.attachmentId(for: .tg) else { return nil }
+                return .fileId(attachmentId)
             case let .url(url):
                 return .url(url)
             case let .file(file):
@@ -39,7 +39,7 @@ public struct FileInfo: Codable {
     
     let content: Content
     
-    public init(type: FileInfo.`Type`, content: FileInfo.Content) {
+    public init(type: FileInfoType, content: FileInfo.Content) {
         self.type = type
         self.content = content
     }
@@ -49,10 +49,12 @@ public struct FileInfo: Codable {
         case let .fileId(attachable):
             switch type {
             case .photo:
-                guard let photo = Vkontakter.Photo(from: attachable.attachmentId) else { return nil }
+                guard let attachmentId = attachable.attachmentId(for: .vk),
+                      let photo = Vkontakter.Photo(from: attachmentId) else { return nil }
                 return .photo(photo)
             case .document:
-                guard let doc = Vkontakter.Doc(from: attachable.attachmentId) else { return nil }
+                guard let attachmentId = attachable.attachmentId(for: .vk),
+                      let doc = Vkontakter.Doc(from: attachmentId) else { return nil }
                 return .doc(doc)
             }
             
