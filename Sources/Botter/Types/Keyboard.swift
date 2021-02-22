@@ -62,3 +62,18 @@ extension Keyboard: ExpressibleByArrayLiteral {
         self.init(buttons: elements)
     }
 }
+
+public extension Array where Element == [Button] {
+    mutating func safeAppend(_ buttons: [Button]) {
+        guard let lastRow = last else {
+            append(buttons)
+            return
+        }
+        
+        if lastRow.count < 2 {
+            indices.last.map { self[$0] += buttons }
+        } else {
+            append(buttons)
+        }
+    }
+}
