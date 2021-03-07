@@ -81,7 +81,7 @@ public struct Button: Codable {
     public let text: String
     
     ///
-    public let payload: String?
+    public var payload: String?
     
     public init<T: Encodable>(text: String, action: Action, color: Vkontakter.Button.Color? = nil, data: T? = nil, dataEncoder: JSONEncoder = .snakeCased) throws {
         self.init(text: text, action: action, color: color, payload: String(data: try dataEncoder.encode(data), encoding: .utf8)!)

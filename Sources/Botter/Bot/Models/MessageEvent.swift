@@ -39,9 +39,12 @@ extension MessageEvent: PlatformObject {
         id = tg.id
         peerId = tg.from.id
         fromId = tg.from.id
-        guard let data = tg.data?.data(using: .utf8),
-              let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) else { return nil }
-        self.data = .init(jsonObject)
+        guard let data = tg.data?.data(using: .utf8) else { return nil }
+        if let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) {
+            self.data = .init(jsonObject)
+        } else {
+            self.data = .init(data)
+        }
     }
 
     init?(from vk: Vk) {
@@ -51,7 +54,11 @@ extension MessageEvent: PlatformObject {
         peerId = vk.peerId
         fromId = vk.userId
         guard let data = vk.payload else { return nil }
-        self.data = data
+        if let str = data.value as? String {
+            self.data = .init(str.data(using: .utf8))
+        } else {
+            self.data = data
+        }
     }
     
 }

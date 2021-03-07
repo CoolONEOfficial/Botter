@@ -163,6 +163,56 @@ extension FileInfo.Content {
 
 }
 
+extension SendDestination {
+
+    enum CodingKeys: String, CodingKey {
+        case chatId
+        case username
+        case userId
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        if container.allKeys.contains(.chatId), try container.decodeNil(forKey: .chatId) == false {
+            var associatedValues = try container.nestedUnkeyedContainer(forKey: .chatId)
+            let associatedValue0 = try associatedValues.decode(Int64.self)
+            self = .chatId(associatedValue0)
+            return
+        }
+        if container.allKeys.contains(.username), try container.decodeNil(forKey: .username) == false {
+            var associatedValues = try container.nestedUnkeyedContainer(forKey: .username)
+            let associatedValue0 = try associatedValues.decode(String.self)
+            self = .username(associatedValue0)
+            return
+        }
+        if container.allKeys.contains(.userId), try container.decodeNil(forKey: .userId) == false {
+            var associatedValues = try container.nestedUnkeyedContainer(forKey: .userId)
+            let associatedValue0 = try associatedValues.decode(Int64.self)
+            self = .userId(associatedValue0)
+            return
+        }
+        throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown enum case"))
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case let .chatId(associatedValue0):
+            var associatedValues = container.nestedUnkeyedContainer(forKey: .chatId)
+            try associatedValues.encode(associatedValue0)
+        case let .username(associatedValue0):
+            var associatedValues = container.nestedUnkeyedContainer(forKey: .username)
+            try associatedValues.encode(associatedValue0)
+        case let .userId(associatedValue0):
+            var associatedValues = container.nestedUnkeyedContainer(forKey: .userId)
+            try associatedValues.encode(associatedValue0)
+        }
+    }
+
+}
+
 extension Update.Content {
 
     enum CodingKeys: String, CodingKey {

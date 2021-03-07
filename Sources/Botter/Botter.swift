@@ -48,3 +48,19 @@ public final class Bot {
         
     }
 }
+
+extension Bot {
+    enum BotError: Error {
+        case botNotFound
+    }
+
+    func requireVkBot() throws -> Vkontakter.Bot {
+        guard let vk = vk else { throw BotError.botNotFound }
+        return vk
+    }
+    
+    func requireTgBot() throws -> Telegrammer.Bot {
+        guard let tg = tg else { throw BotError.botNotFound }
+        return tg
+    }
+}

@@ -10,6 +10,8 @@ import AnyCodable
 
 public typealias AnyPlatform = Platform<AnyCodable, AnyCodable>
 
+public typealias TypedPlatform<T: Codable> = Platform<T, T>
+
 public enum Platform<Tg: Codable, Vk: Codable> {
     case tg(Tg)
     case vk(Vk)
@@ -25,6 +27,19 @@ public extension Array where Element == AnyPlatform {
 }
 
 public extension Platform {
+    var name: String {
+        switch self {
+        case .tg:
+            return CodingKeys.tg.rawValue
+        case .vk:
+            return CodingKeys.vk.rawValue
+        }
+    }
+    
+    var any: AnyPlatform {
+        convert(to: AnyCodable())
+    }
+    
     func same<Tg, Vk>(_ platform: Platform<Tg, Vk>) -> Bool {
         switch self {
         case .tg:
@@ -77,7 +92,7 @@ extension Platform: Equatable where Tg: Equatable, Vk: Equatable {
 }
 
 public extension Platform {
-    func to<T: Codable>(_ value: T) -> Platform<T, T> {
+    func convert<T: Codable>(to value: T) -> Platform<T, T> {
         switch self {
         case .tg:
             return .tg(value)

@@ -8,6 +8,7 @@
 import Foundation
 import Vkontakter
 import Telegrammer
+import Vapor
 
 public struct User: Codable {
 
@@ -16,6 +17,10 @@ public struct User: Codable {
     public let firstName: String?
     
     public let lastName: String?
+    
+    //public let username: String?
+    
+    // TODO: load username from vk
     
     // MARK: - Platform object
     
@@ -34,6 +39,7 @@ extension User: PlatformObject {
         platform = .vk(vk)
         firstName = vk.firstName
         lastName = vk.lastName
+        //username = vk.screenName
         id = vk.id
     }
     
@@ -43,7 +49,25 @@ extension User: PlatformObject {
         platform = .tg(tg)
         firstName = tg.firstName
         lastName = tg.lastName
+        //username = tg.username
         id = tg.id
+    }
+    
+}
+
+extension User {
+    
+    public func getUsername(bot: Bot, app: Application) throws -> Future<String?> {
+        switch platform {
+        case let .tg(tg):
+            return app.eventLoopGroup.future(tg.username)
+        case let .vk(vk):
+            if let username = vk.screenName {
+                return app.eventLoopGroup.future(username)
+            } else {
+                return try bot.requireVkBot().getUser(params: .init(userIds: [.id(id)], fields: [.screen_name])).map(\.first?.screenName)
+            }
+        }
     }
     
 }

@@ -15,7 +15,7 @@ public protocol Attachable: Codable {
 extension Attachable {
     func object(for platform: AnyPlatform) -> BotterAttachable? {
         guard let attachmentId = attachmentId(for: platform) else { return nil }
-        return .init(platform.to(attachmentId))
+        return .init(platform.convert(to: attachmentId))
     }
 }
 
