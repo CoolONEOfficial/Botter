@@ -83,11 +83,11 @@ public struct Button: Codable {
     ///
     public var payload: String?
     
-    public init<T: Encodable>(text: String, action: Action, color: Vkontakter.Button.Color? = nil, data: T? = nil, dataEncoder: JSONEncoder = .snakeCased) throws {
+    public init<T: Encodable>(text: String, action: Action = .callback, color: Vkontakter.Button.Color? = nil, data: T? = nil, dataEncoder: JSONEncoder = .snakeCased) throws {
         self.init(text: text, action: action, color: color, payload: String(data: try dataEncoder.encode(data), encoding: .utf8)!)
     }
 
-    public init(text: String, action: Action, color: Vkontakter.Button.Color? = nil, payload: String? = nil) {
+    public init(text: String, action: Action = .callback, color: Vkontakter.Button.Color? = nil, payload: String? = nil) {
         if let payload = payload, payload.count > 64 {
             log.warning(.init(stringLiteral: "Telegram doesn't support payload >64 bytes!"))
         }
@@ -112,7 +112,7 @@ public struct Button: Codable {
         case .app(_):
             return .init(text: text) // TODO: callbackGame: CallbackGame()
         case .callback:
-            return .init(text: text, callbackData: payload)
+            return .init(text: text, callbackData: payload ?? "nope")
         }
     }
     

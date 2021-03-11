@@ -147,7 +147,7 @@ public extension Bot {
     }
 
     @discardableResult
-    func sendMessage<Tg, Vk>(params: SendMessageParams, platform: Platform<Tg, Vk>, app: Application) throws -> Future<Message> {
+    func sendMessage<Tg, Vk>(params: SendMessageParams, platform: Platform<Tg, Vk>, app: Application) throws -> Future<[Message]> {
         guard let destination = params.destination else { throw SendMessageError.destinationNotFound }
         switch platform {
         case .vk:
@@ -156,11 +156,11 @@ public extension Bot {
             switch destination {
             case let .chatId(peerId),
                  let .userId(peerId):
-                return try sendVkMessage(vk: vk, params: params, peerId: peerId, app: app)
+                return try sendVkMessage(vk: vk, params: params, peerId: peerId, app: app).map { [$0] }
             
             case let .username(username):
                 return try vk.getUser(params: .init(userIds: [ .username(username) ])).map(\.first?.id).unwrap(orError: SendMessageError.destinationNotFound).flatMap { userId in
-                    try! self.sendVkMessage(vk: vk, params: params, peerId: userId, app: app)
+                    try! self.sendVkMessage(vk: vk, params: params, peerId: userId, app: app).map { [$0] }
                 }
             }
             
@@ -223,28 +223,39 @@ public extension Bot {
         return try vk.sendMessage(params: vkParams).map { Message(params: vkParams, resp: $0)! }
     }
     
-    private func sendTgMessage(tg: Telegrammer.Bot, params: SendMessageParams, destination: SendDestination, app: Application) throws -> Future<Message> {
+    private func sendTgMessage(tg: Telegrammer.Bot, params: SendMessageParams, destination: SendDestination, app: Application) throws -> Future<[Message]> {
         if let attachments = params.attachments, !attachments.isEmpty {
             if attachments.count == 1 {
                 let attachment = attachments.first!
-                let future: Future<Message>
+                let future: Future<[Message]>
                 switch attachment.type {
                 case .photo:
                     let params = try params.tgPhoto(destination: destination, attachment.content)
-                    future = try tg.sendPhoto(params: params).map { Message(from: $0) }
+                    future = try tg.sendPhoto(params: params).map { [Message(from: $0)] }
                 case .document:
                     let params = try params.tgDocument(destination: destination, attachment.content)
-                    future = try tg.sendDocument(params: params).map { Message(from: $0) }
+                    future = try tg.sendDocument(params: params).map { [Message(from: $0)] }
                 }
                 return future
             } else {
-                let params = try params.tgGroup(destination: destination, attachments)
-                return try tg.sendMediaGroup(params: params).map { Message(from: $0.first!) }
+                var future: Future<[Message]>
+                
+                let mediaGroupParams = try params.tgGroup(destination: destination, attachments)
+                future = try tg.sendMediaGroup(params: mediaGroupParams).map { $0.map { Message(from: $0) } }
+                
+                if let text = params.text {
+                    let messageParams = try params.tgMessage(destination: destination, text)
+                    future = future.flatMap { messages in
+                        try! tg.sendMessage(params: messageParams).map { [Message(from: $0)] + messages }
+                    }
+                }
+                
+                return future
             }
         }
         
         guard let text = params.text else { throw SendMessageError.textNotFound }
         let params = try params.tgMessage(destination: destination, text)
-        return try tg.sendMessage(params: params).map { Message(from: $0) }
+        return try tg.sendMessage(params: params).map { [Message(from: $0)] }
     }
 }

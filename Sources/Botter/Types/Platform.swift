@@ -8,22 +8,11 @@
 import Foundation
 import AnyCodable
 
-public typealias AnyPlatform = Platform<AnyCodable, AnyCodable>
-
-public typealias TypedPlatform<T: Codable> = Platform<T, T>
+// MARK: - Platform
 
 public enum Platform<Tg: Codable, Vk: Codable> {
     case tg(Tg)
     case vk(Vk)
-}
-
-public extension AnyPlatform {
-    static let tg: Self = .tg(.init())
-    static let vk: Self = .vk(.init())
-}
-
-public extension Array where Element == AnyPlatform {
-    static let all: Self = [ .vk, .tg ]
 }
 
 public extension Platform {
@@ -52,6 +41,16 @@ public extension Platform {
             }
         }
         return false
+    }
+}
+
+public extension Array {
+    func first<Tg, Vk>(for platform: AnyPlatform) -> Element? where Element == Platform<Tg, Vk> {
+        first { $0.any == platform }
+    }
+    
+    func firstValue<T>(for platform: AnyPlatform) -> T? where Element == TypedPlatform<T> {
+        first(for: platform)?.value
     }
 }
 
@@ -87,7 +86,6 @@ extension Platform: Equatable where Tg: Equatable, Vk: Equatable {
             }
         }
     }
-    
     
 }
 
@@ -139,15 +137,19 @@ extension Platform: Codable {
 
 }
 
-//extension Platform: Codable {
-//    enum CodingKeys: CodingKey {
-//        case tg
-//        case vk
-//    }
-//
-//    public init(from decoder: Decoder) throws {
-//        let container = decoder.container(keyedBy: CodingKeys.self)
-//
-//        container.
-//    }
-//}
+// MARK: - AnyPlatform
+
+public typealias AnyPlatform = Platform<AnyCodable, AnyCodable>
+
+public extension AnyPlatform {
+    static let tg: Self = .tg(.init())
+    static let vk: Self = .vk(.init())
+}
+
+public extension Array where Element == AnyPlatform {
+    static let all: Self = [ .vk, .tg ]
+}
+
+// MARK: - Typed platform
+
+public typealias TypedPlatform<T: Codable> = Platform<T, T>
