@@ -148,6 +148,20 @@ public extension AnyPlatform {
 
 public extension Array where Element == AnyPlatform {
     static let all: Self = [ .vk, .tg ]
+    
+    static func available(bot: Bot) -> Self {
+        var platforms = Self()
+        
+        if bot.vk != nil {
+            platforms.append(.vk)
+        }
+        
+        if bot.tg != nil {
+            platforms.append(.tg)
+        }
+        
+        return platforms
+    }
 }
 
 // MARK: - Typed platform
