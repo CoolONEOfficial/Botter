@@ -29,7 +29,7 @@ public extension Platform {
         convert(to: AnyCodable())
     }
     
-    func same<Tg, Vk>(_ platform: Platform<Tg, Vk>) -> Bool {
+    func same(_ platform: AnyPlatform) -> Bool {
         switch self {
         case .tg:
             if case .tg = platform {
