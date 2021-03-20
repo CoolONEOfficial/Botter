@@ -12,13 +12,16 @@ import Dispatch
 import NIO
 import Logging
 import AsyncHTTPClient
+import Vapor
 
 public class Dispatcher {
     public let vk: Vkontakter.Dispatcher?
     public let tg: Telegrammer.Dispatcher?
     private let dispatchers: [BaseDispatcher]
+    private let bot: Bot
+    private let app: Application
     
-    public init(bot: Bot, worker: Worker = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)) {
+    public init(bot: Bot, app: Application, worker: Worker = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)) {
         if let vkBot = bot.vk {
             vk = .init(bot: vkBot, worker: worker)
         } else {
@@ -29,6 +32,8 @@ public class Dispatcher {
         } else {
             tg = nil
         }
+        self.bot = bot
+        self.app = app
         dispatchers = ([tg, vk] as [BaseDispatcher?]).compactMap { $0 }
     }
     
@@ -48,6 +53,9 @@ public extension Dispatcher {
      - group: Group of `Dispatcher`'s handler queue, `zero` group by default
      */
     func add(handler: Handler, to group: HandlerGroup = .init(vk: .zero, tg: .zero)) {
+        var handler = handler
+        handler.app = app
+        handler.bot = bot
         vk?.add(handler: handler.vk, to: group.vk)
         tg?.add(handler: handler.tg, to: group.tg)
     }

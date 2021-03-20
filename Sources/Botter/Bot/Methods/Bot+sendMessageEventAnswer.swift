@@ -77,7 +77,7 @@ public extension Bot {
     }
 
     @discardableResult
-    func sendMessageEventAnswer<Tg, Vk>(params: SendMessageEventAnswerParams, platform: Platform<Tg, Vk>) throws -> Future<Bool> {
+    func sendMessageEventAnswer(_ params: SendMessageEventAnswerParams, platform: AnyPlatform) throws -> Future<Bool> {
         switch platform {
         case .vk:
             guard let vk = vk else { throw SendMessageEventAnserError.botNotFound }

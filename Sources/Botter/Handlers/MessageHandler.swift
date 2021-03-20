@@ -8,6 +8,7 @@
 import AsyncHTTPClient
 import Telegrammer
 import Vkontakter
+import Vapor
 
 /// Handler for bot messages, can handle normal messages, channel posts, edited messages
 public class MessageHandler: Handler {
@@ -34,21 +35,25 @@ public class MessageHandler: Handler {
     let filters: Filters
     public let callback: HandlerCallback
     let options: Options
+    public var app: Application!
+    public var bot: Bot!
 
     public lazy var vk: Vkontakter.Handler = Vkontakter.MessageHandler(
         name: name, filters: filters.vk,
         options: .init(rawValue: options.rawValue)
-    ) { update, context throws in
+    ) { update, _ throws in
         guard let update = Update(from: update) else { return }
-        try! self.callback(update, nil)
+        let context = BotContext(app: self.app, bot: self.bot, platform: update.platform.any)
+        try! self.callback(update, context)
     }
     
     public lazy var tg: Telegrammer.Handler = Telegrammer.MessageHandler (
         name: name, filters: filters.tg,
         options: .init(rawValue: options.rawValue)
-    ) { update, context throws in
+    ) { update, _ throws in
         guard let update = Update(from: update) else { return }
-        try! self.callback(update, nil)
+        let context = BotContext(app: self.app, bot: self.bot, platform: update.platform.any)
+        try! self.callback(update, context)
     }
     
     public init(

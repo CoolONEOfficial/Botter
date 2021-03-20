@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "Botter",
     platforms: [
-        .macOS(.v10_15)
+        .macOS(.v11)
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
@@ -15,9 +15,10 @@ let package = Package(
             targets: ["Botter"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.9.0"),
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.41.1"),
         //.package(url: "https://github.com/givip/Telegrammer.git", .branch("develop")),
-        .package(url: "https://github.com/givip/telegrammer-vapor-middleware.git", .branch("develop")),
+        //.package(url: "https://github.com/givip/telegrammer-vapor-middleware.git", .branch("develop")),
+        .package(path: "./telegrammer-vapor-middleware"),
         .package(path: "./Vkontakter"),
         .package(path: "./Telegrammer"),
         .package(path: "./vkontakter-vapor-middleware"),

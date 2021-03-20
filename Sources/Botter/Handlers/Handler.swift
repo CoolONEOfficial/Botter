@@ -10,9 +10,7 @@ import Vkontakter
 import Telegrammer
 import Vapor
 
-public protocol BotContext {}
-
-public typealias HandlerCallback = (_ update: Update, _ context: BotContext?) throws -> Void
+public typealias HandlerCallback = (_ update: Update, _ context: BotContextProtocol) throws -> Void
 
 /**
  Protocol for any update handler
@@ -24,12 +22,18 @@ public protocol Handler {
     var vk: Vkontakter.Handler { get }
     var tg: Telegrammer.Handler { get }
     var callback: HandlerCallback { get }
+    var app: Application! { get set }
+    var bot: Bot! { get set }
 
     func check(update: Update) -> Bool
     func handle(update: Update, dispatcher: Dispatcher)
 }
 
 extension Handler {
+    internal func context(_ platform: AnyPlatform) -> BotContext {
+        .init(app: app, bot: bot, platform: platform)
+    }
+    
     public var name: String {
         return String(describing: Self.self)
     }
@@ -45,7 +49,8 @@ extension Handler {
     
     public func handle(update: Update, dispatcher: Dispatcher) {
         do {
-            try callback(update, nil)
+            let context = BotContext(app: app, bot: bot, platform: update.platform.any)
+            try callback(update, context)
         } catch {
             log.error(error.logMessage)
         }

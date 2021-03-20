@@ -8,9 +8,11 @@
 import AsyncHTTPClient
 import Telegrammer
 import Vkontakter
+import Vapor
 
 /// Handler for bot messages, can handle normal messages, channel posts, edited messages
 public class CommandHandler: Handler {
+
 
     /// Name of particular MessageHandler, needed for determine handlers instances of one class in groups
     public var name: String
@@ -31,21 +33,23 @@ public class CommandHandler: Handler {
     let filters: Filters
     public let callback: HandlerCallback
     let options: Options
+    public var app: Application!
+    public var bot: Bot!
 
     public lazy var vk: Vkontakter.Handler = Vkontakter.CommandHandler(
         name: name, commands: commands, filters: filters.vk,
         options: .init(rawValue: options.rawValue)
-    ) { update, context throws in
+    ) { update, _ throws in
         guard let update = Update(from: update) else { return }
-        try! self.callback(update, nil)
+        try! self.callback(update, self.context(update.platform.any))
     }
     
     public lazy var tg: Telegrammer.Handler = Telegrammer.CommandHandler (
         name: name, commands: commands.map { "/" + $0 }, filters: filters.tg,
         options: .init(rawValue: options.rawValue)
-    ) { update, context throws in
+    ) { update, _ throws in
         guard let update = Update(from: update) else { return }
-        try! self.callback(update, nil)
+        try! self.callback(update, self.context(update.platform.any))
     }
     
     public init(

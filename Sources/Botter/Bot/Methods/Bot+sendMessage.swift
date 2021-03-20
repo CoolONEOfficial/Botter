@@ -88,12 +88,6 @@ public extension Bot {
     /// Parameters container struct for `sendMessage` method
     class SendMessageParams: Codable {
 
-//        /// Идентификатор чата, которому отправляется сообщение. (только для Tg)
-//        public var chatId: Int64?
-//
-//        /// Идентификатор пользователя, которому отправляется сообщение. (для Vk или Tg)
-//        public var userId: Int64?
-//
         public var destination: SendDestination?
 
         /// Текст личного сообщения.
@@ -107,15 +101,10 @@ public extension Bot {
 
         public convenience init?(to replyable: Replyable, text: String? = nil, keyboard: Keyboard? = nil, attachments: [FileInfo]? = nil) {
             guard let destination = replyable.destination else { return nil }
-            self.init(//chatId: replyable.chatId, userId: replyable.userId,
-                destination: destination, text: text, keyboard: keyboard, attachments: attachments)
+            self.init(destination: destination, text: text, keyboard: keyboard, attachments: attachments)
         }
         
-        public init(//chatId: Int64? = nil, userId: Int64? = nil,
-            destination: SendDestination? = nil,
-            text: String? = nil, keyboard: Keyboard? = nil, attachments: [FileInfo]? = nil) {
-//            self.chatId = chatId
-//            self.userId = userId
+        public init(destination: SendDestination? = nil, text: String? = nil, keyboard: Keyboard? = nil, attachments: [FileInfo]? = nil) {
             self.destination = destination
             self.text = text
             self.keyboard = keyboard
@@ -147,7 +136,7 @@ public extension Bot {
     }
 
     @discardableResult
-    func sendMessage<Tg, Vk>(params: SendMessageParams, platform: Platform<Tg, Vk>, app: Application) throws -> Future<[Message]> {
+    func sendMessage(_ params: SendMessageParams, platform: AnyPlatform, context: BotContextProtocol) throws -> Future<[Message]> {
         guard let destination = params.destination else { throw SendMessageError.destinationNotFound }
         switch platform {
         case .vk:
@@ -156,18 +145,18 @@ public extension Bot {
             switch destination {
             case let .chatId(peerId),
                  let .userId(peerId):
-                return try sendVkMessage(vk: vk, params: params, peerId: peerId, app: app).map { [$0] }
+                return try sendVkMessage(vk: vk, params: params, peerId: peerId, app: context.app).map { [$0] }
             
             case let .username(username):
                 return try vk.getUser(params: .init(userIds: [ .username(username) ])).map(\.first?.id).unwrap(orError: SendMessageError.destinationNotFound).flatMap { userId in
-                    try! self.sendVkMessage(vk: vk, params: params, peerId: userId, app: app).map { [$0] }
+                    try! self.sendVkMessage(vk: vk, params: params, peerId: userId, app: context.app).map { [$0] }
                 }
             }
             
         case .tg:
             let tg = try requireTgBot()
             
-            return try sendTgMessage(tg: tg, params: params, destination: destination, app: app)
+            return try sendTgMessage(tg: tg, params: params, destination: destination, app: context.app)
         }
     }
     

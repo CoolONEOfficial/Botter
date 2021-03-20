@@ -36,8 +36,8 @@ extension Message: Replyable {
 }
 
 public extension Message {
-    func reply(from bot: Bot, params: Bot.SendMessageParams, app: Application) throws -> Future<[Message]> {
-        try replyMessage(from: bot, params: params, app: app)
+    func reply(_ params: Bot.SendMessageParams, context: BotContextProtocol) throws -> Future<[Message]> {
+        try replyMessage(params, context: context)
     }
 }
 
@@ -71,20 +71,21 @@ extension MessageEvent: Replyable {
 extension Bot.SendMessageParams: Replyable {}
 
 public extension MessageEvent {
-    func reply(from bot: Bot, params: Bot.SendMessageEventAnswerParams, app: Application) throws -> Future<Bool> {
+    func reply(_ params: Bot.SendMessageEventAnswerParams, platform: AnyPlatform? = nil, context: BotContextProtocol) throws -> Future<Bool> {
+        let platform = platform ?? context.platform
         var params = params
         params.event = self
-        return try bot.sendMessageEventAnswer(params: params, platform: platform)
+        return try context.bot.sendMessageEventAnswer(params, platform: platform)
     }
 }
 
 public extension Replyable where Self: PlatformObject {
-    func replyMessage(from bot: Bot, params: Bot.SendMessageParams, app: Application) throws -> Future<[Message]> {
+    func replyMessage(_ params: Bot.SendMessageParams, context: BotContextProtocol) throws -> Future<[Message]> {
         if let destination = destination {
             params.destination = destination
         } else {
             throw Bot.SendMessageError.destinationNotFound
         }
-        return try bot.sendMessage(params: params, platform: platform, app: app)
+        return try context.bot.sendMessage(params, platform: platform.any, context: context)
     }
 }
