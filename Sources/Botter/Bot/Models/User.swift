@@ -18,10 +18,6 @@ public struct User: Codable {
     
     public let lastName: String?
     
-    //public let username: String?
-    
-    // TODO: load username from vk
-    
     // MARK: - Platform object
     
     public typealias Tg = Telegrammer.User
@@ -39,7 +35,6 @@ extension User: PlatformObject {
         platform = .vk(vk)
         firstName = vk.firstName
         lastName = vk.lastName
-        //username = vk.screenName
         id = vk.id
     }
     
@@ -49,7 +44,6 @@ extension User: PlatformObject {
         platform = .tg(tg)
         firstName = tg.firstName
         lastName = tg.lastName
-        //username = tg.username
         id = tg.id
     }
     
