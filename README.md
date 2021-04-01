@@ -53,7 +53,7 @@ var settings = Bot.Settings(vk: vkSettings, tg: tgSettings)
 let bot = try Bot(settings: settings)
 
 let echoHandler = MessageHandler { (update, context) in
-		guard case let .message(message) = update.content,
+    guard case let .message(message) = update.content,
           let text = message.text else { return }
 
     _ = try bot.getUser(from: update, app: context.app)?.throwingFlatMap { user in
