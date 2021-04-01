@@ -19,9 +19,9 @@ public class Dispatcher {
     public let tg: Telegrammer.Dispatcher?
     private let dispatchers: [BaseDispatcher]
     private let bot: Bot
-    private let app: Application
+    private let app: Application?
     
-    public init(bot: Bot, app: Application, worker: Worker = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)) {
+    public init(bot: Bot, app: Application?, worker: Worker = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)) {
         if let vkBot = bot.vk {
             vk = .init(bot: vkBot, worker: worker)
         } else {

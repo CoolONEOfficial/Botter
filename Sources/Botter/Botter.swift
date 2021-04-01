@@ -12,19 +12,19 @@ let log = Logger(label: "com.gp-apps.botter")
 public typealias Worker = EventLoopGroup
 
 public protocol BotContextProtocol {
-    var app: Application { get }
+    var app: Application! { get }
     var bot: Botter.Bot { get }
     var platform: AnyPlatform { get }
 }
 
 public struct BotContext: BotContextProtocol {
-    public init(app: Application, bot: Bot, platform: AnyPlatform) {
+    public init(app: Application?, bot: Bot, platform: AnyPlatform) {
         self.app = app
         self.bot = bot
         self.platform = platform
     }
     
-    public let app: Application
+    public let app: Application!
     public let bot: Botter.Bot
     public let platform: AnyPlatform
 }

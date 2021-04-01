@@ -6,23 +6,23 @@ import PackageDescription
 let package = Package(
     name: "Botter",
     platforms: [
-        .macOS(.v11)
+        .macOS(.v10_15)
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "Botter",
-            targets: ["Botter"]),
+            targets: ["Botter"]
+        ),
+        .executable(name: "Botter EchoBot", targets: [ "BotterDemoEchoBot" ])
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", from: "4.41.1"),
-        //.package(url: "https://github.com/givip/Telegrammer.git", .branch("develop")),
-        //.package(url: "https://github.com/givip/telegrammer-vapor-middleware.git", .branch("develop")),
-        .package(path: "./telegrammer-vapor-middleware"),
-        .package(path: "./Vkontakter"),
-        .package(path: "./Telegrammer"),
-        .package(path: "./vkontakter-vapor-middleware"),
-        .package(url: "https://github.com/Flight-School/AnyCodable", from: "0.4.0"),
+        .package(url: "https://github.com/givip/Telegrammer.git", .branch("master")),
+        .package(url: "https://github.com/nerzh/telegrammer-vapor-middleware.git", .branch("master")),
+        .package(url: "https://github.com/CoolONEOfficial/Vkontakter.git", .branch("master")),
+        .package(url: "https://github.com/CoolONEOfficial/vkontakter-vapor-middleware.git", .branch("master")),
+        .package(url: "https://github.com/Flight-School/AnyCodable.git", from: "0.4.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -36,9 +36,12 @@ let package = Package(
                 .product(name: "TelegrammerMiddleware", package: "telegrammer-vapor-middleware"),
                 .product(name: "VkontakterMiddleware", package: "vkontakter-vapor-middleware"),
                 .product(name: "AnyCodable", package: "AnyCodable"),
-            ]),
+            ]
+        ),
         .testTarget(
             name: "BotterTests",
-            dependencies: ["Botter"]),
+            dependencies: ["Botter"]
+        ),
+        .target(name: "BotterDemoEchoBot", dependencies: ["Botter"]),
     ]
 )
