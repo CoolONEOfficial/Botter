@@ -70,7 +70,7 @@ public extension Array where Element == [Button] {
             return
         }
         
-        if lastRow.count < 2 {
+        if lastRow.count < 2 && lastRow.map(\.text.count).reduce(0, +) < 18 {
             indices.last.map { self[$0] += buttons }
         } else {
             append(buttons)
