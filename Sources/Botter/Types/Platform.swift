@@ -44,6 +44,17 @@ public extension Platform {
     }
 }
 
+extension Platform: CustomStringConvertible where Tg: CustomStringConvertible, Vk: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case let .tg(tg):
+            return tg.description
+        case let .vk(vk):
+            return vk.description
+        }
+    }
+}
+
 public extension Array {
     func first<Tg, Vk>(for platform: AnyPlatform) -> Element? where Element == Platform<Tg, Vk> {
         first { $0.any == platform }

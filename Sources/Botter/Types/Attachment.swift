@@ -24,6 +24,47 @@ public extension Attachment {
             return doc.attachmentId
         }
     }
+
+    func getUrl(context: BotContextProtocol) throws -> Future<String?>? {
+        let app = context.app
+        switch self {
+        case let .photo(photo):
+            switch photo.platform {
+            case let .tg(tg):
+                return try tg.largerElement!.getUrl(context: context)
+                
+            case let .vk(vk):
+                return app.eventLoopGroup.future(vk.sizes?.sorted { $0.width ?? 0 > $1.width ?? 0 }.first?.url)
+            }
+
+        case let .document(doc):
+            switch doc.platform {
+            case let .tg(tg):
+                return try tg.getUrl(context: context)
+                
+            case let .vk(vk):
+                return app.eventLoopGroup.future(vk.url)
+            }
+        }
+    }
+}
+
+protocol TgFileIdentificable {
+    var fileId: String { get }
+}
+
+extension Telegrammer.Document: TgFileIdentificable {}
+extension Telegrammer.File: TgFileIdentificable {}
+extension Telegrammer.PhotoSize: TgFileIdentificable {}
+
+extension TgFileIdentificable {
+    func getUrl(context: BotContextProtocol) throws -> Future<String?>? {
+        let bot = context.bot
+        return try bot.tg?.getFile(params: .init(fileId: fileId)).map { file in
+            guard let path = file.filePath else { return nil }
+            return "https://api.telegram.org/file/bot\(bot.tg!.settings.token)/\(path)"
+        }
+    }
 }
 
 extension Telegrammer.Message {
@@ -34,8 +75,8 @@ extension Telegrammer.Message {
             attachments.append(.document(botterDoc))
         }
         
-        if let photo = photo {
-            attachments.append(contentsOf: photo.compactMap { Photo(from: $0) }.map { .photo($0) })
+        if let photo = photo, let botterPhoto = Photo(from: photo) {
+            attachments.append(.photo(botterPhoto))
         }
         
         return attachments

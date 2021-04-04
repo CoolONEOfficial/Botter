@@ -22,14 +22,14 @@ public struct Photo {
 
 extension Photo: PlatformObject {
     
-    public typealias Tg = Telegrammer.PhotoSize
+    public typealias Tg = [Telegrammer.PhotoSize]
     public typealias Vk = Vkontakter.Photo
     
     init?(from tg: Tg) {
         platform = .tg(tg)
 
-        attachmentId = tg.fileId
-        sizes = [ Size(from: tg) ].compactMap { $0 }
+        attachmentId = tg.largerElement!.fileId
+        sizes = tg.map { Size(from: $0) }.compactMap { $0 }
     }
 
     init?(from vk: Vk) {
@@ -39,6 +39,12 @@ extension Photo: PlatformObject {
         sizes = vk.sizes?.compactMap { Size(from: $0) } ?? []
     }
     
+}
+
+extension Array where Element == Telegrammer.PhotoSize {
+    var largerElement: Element? {
+        sorted { $0.fileSize ?? 0 > $1.fileSize ?? 0 }.first
+    }
 }
 
 public extension Photo {
