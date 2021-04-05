@@ -149,9 +149,9 @@
         "package": "Telegrammer",
         "repositoryURL": "https://github.com/givip/Telegrammer.git",
         "state": {
-          "branch": "master",
-          "revision": "5c01efbbafbaefd0d69ff5032257c47953773690",
-          "version": null
+          "branch": null,
+          "revision": "cc49bfecc2d5cc07f4162dddd1982813c4859fee",
+          "version": "1.0.0-alpha.4.0.1"
         }
       },
       {
@@ -176,18 +176,18 @@
         "package": "Vkontakter",
         "repositoryURL": "https://github.com/CoolONEOfficial/Vkontakter.git",
         "state": {
-          "branch": "master",
-          "revision": "54b1d84089555071d99a8c3beeb17ea5e0a9babc",
-          "version": null
+          "branch": null,
+          "revision": "62611337a90f6a9d76e8f5aedc1d401c43910c02",
+          "version": "0.1.0"
         }
       },
       {
         "package": "vkontakter-vapor-middleware",
         "repositoryURL": "https://github.com/CoolONEOfficial/vkontakter-vapor-middleware.git",
         "state": {
-          "branch": "master",
-          "revision": "9788dd60bb3a68a585d32fb9a02e68b0b66416ca",
-          "version": null
+          "branch": null,
+          "revision": "76d8b5a797dc9b03130c9ac8ee3fac604a4627f5",
+          "version": "0.1.0"
         }
       },
       {

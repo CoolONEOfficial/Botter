@@ -18,10 +18,10 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", from: "4.41.1"),
-        .package(url: "https://github.com/givip/Telegrammer.git", .branch("master")),
+        .package(url: "https://github.com/givip/Telegrammer.git", from: "1.0.0-alpha.4.0.1"),
         .package(url: "https://github.com/nerzh/telegrammer-vapor-middleware.git", .branch("master")),
-        .package(url: "https://github.com/CoolONEOfficial/Vkontakter.git", .branch("master")),
-        .package(url: "https://github.com/CoolONEOfficial/vkontakter-vapor-middleware.git", .branch("master")),
+        .package(url: "https://github.com/CoolONEOfficial/Vkontakter.git", .exact("0.1.0")),
+        .package(url: "https://github.com/CoolONEOfficial/vkontakter-vapor-middleware.git", .exact("0.1.0")),
         .package(url: "https://github.com/Flight-School/AnyCodable.git", from: "0.4.0"),
     ],
     targets: [
