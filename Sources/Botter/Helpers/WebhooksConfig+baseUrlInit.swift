@@ -12,8 +12,8 @@ import Telegrammer
 // MARK: - Webhooks config inits
 
 extension Vkontakter.Webhooks.Config {
-    public init(ip: String, baseUrl: String, groupId: UInt64? = nil) {
-        self.init(ip: ip, url: baseUrl + "/vk", groupId: groupId)
+    public init(ip: String, baseUrl: String, port: Int, groupId: UInt64? = nil) {
+        self.init(ip: ip, url: baseUrl + "/vk", port: port, groupId: groupId)
     }
 }
 
