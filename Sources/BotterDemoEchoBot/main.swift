@@ -16,16 +16,17 @@ guard let tgToken = Enviroment.get("TG_BOT_TOKEN") else {
 }
 
 var vkSettings = Vkontakter.Bot.Settings(token: vkToken)
+let vkPort = Int(Enviroment.get("VK_PORT") ?? "1213")!
 
 vkSettings.webhooksConfig = .init(
     ip: "0.0.0.0",
     url: Enviroment.get("VK_BOT_WEBHOOK_URL")!, // or use openUrl(80)
+    port: vkPort,
     groupId: UInt64(Enviroment.get("VK_GROUP_ID")!)!
 )
 
 var tgSettings = Telegrammer.Bot.Settings(token: tgToken)
-
-let tgPort = Int(Enviroment.get("TG_PORT") ?? "8443")!
+let tgPort = Int(Enviroment.get("TG_PORT") ?? "1212")!
  
 tgSettings.webhooksConfig = .init(
     ip: "0.0.0.0",
