@@ -147,11 +147,11 @@
       },
       {
         "package": "Telegrammer",
-        "repositoryURL": "https://github.com/givip/Telegrammer.git",
+        "repositoryURL": "https://github.com/CoolONEOfficial/Telegrammer.git",
         "state": {
-          "branch": null,
-          "revision": "cc49bfecc2d5cc07f4162dddd1982813c4859fee",
-          "version": "1.0.0-alpha.4.0.1"
+          "branch": "patch-2",
+          "revision": "4bff4ef3bc1919903fac1f81f82a47e75e8d973d",
+          "version": null
         }
       },
       {
@@ -177,8 +177,8 @@
         "repositoryURL": "https://github.com/CoolONEOfficial/Vkontakter.git",
         "state": {
           "branch": null,
-          "revision": "690a0a56992c136bebc4304a566371c0c2c42bd1",
-          "version": "0.1.2"
+          "revision": "56521384764704678bfe7fc9236b72880590ad7e",
+          "version": "0.1.3"
         }
       },
       {
