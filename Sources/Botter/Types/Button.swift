@@ -88,13 +88,6 @@ public struct Button: Codable {
     }
 
     public init(text: String, action: Action = .callback, color: Vkontakter.Button.Color? = nil, payload: String? = nil) {
-        if let payload = payload, payload.count > 64 {
-            #if DEBUG
-                fatalError("Telegram doesn't support payload >64 bytes!")
-            #else
-                log.warning(.init(stringLiteral: "Telegram doesn't support payload >64 bytes!"))
-            #endif
-        }
         self.text = text
         self.action = action
         self.color = color
