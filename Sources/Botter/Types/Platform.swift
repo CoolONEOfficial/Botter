@@ -148,6 +148,18 @@ extension Platform: Codable {
 
 }
 
+extension Platform: Hashable where Tg: Hashable, Vk: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .tg(tg):
+            hasher.combine(tg)
+
+        case let .vk(vk):
+            hasher.combine(vk)
+        }
+    }
+}
+
 // MARK: - AnyPlatform
 
 public typealias AnyPlatform = Platform<AnyCodable, AnyCodable>
