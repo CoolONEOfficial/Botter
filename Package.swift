@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.7
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -17,11 +17,11 @@ let package = Package(
         .executable(name: "Botter EchoBot", targets: [ "BotterDemoEchoBot" ])
     ],
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.41.1"),
-        .package(url: "https://github.com/CoolONEOfficial/Telegrammer.git", .branch("patch-2")),
-        .package(url: "https://github.com/nerzh/telegrammer-vapor-middleware.git", .branch("master")),
-        .package(url: "https://github.com/CoolONEOfficial/Vkontakter.git", .exact("0.1.3")),
-        .package(url: "https://github.com/CoolONEOfficial/vkontakter-vapor-middleware.git", .exact("0.1.0")),
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.77.1"),
+        .package(url: "https://github.com/givip/Telegrammer.git", branch: "master"),
+        .package(url: "https://github.com/CoolONEOfficial/telegrammer-vapor-middleware.git", branch: "main"),
+        .package(url: "https://github.com/CoolONEOfficial/vkontakter-vapor-middleware.git", branch: "master"),
+        .package(url: "https://github.com/CoolONEOfficial/Vkontakter.git", from: "0.1.4"),
         .package(url: "https://github.com/Flight-School/AnyCodable.git", from: "0.4.0"),
     ],
     targets: [
