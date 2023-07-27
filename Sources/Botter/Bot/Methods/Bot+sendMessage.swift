@@ -121,7 +121,7 @@ public extension Bot {
         }
         
         func tgGroup(destination: SendDestination, _ content: [FileInfo]) throws -> Telegrammer.Bot.SendMediaGroupParams {
-            .init(chatId: try destination.tgChatId(), media: content.compactMap { $0.tgMedia(caption: text)?.photoAndVideo })
+            .init(chatId: try destination.tgChatId(), media: content.compactMap { $0.tgMedia(caption: text) })
         }
         
         func tgDocument(destination: SendDestination, _ content: FileInfo.Content) throws -> Telegrammer.Bot.SendDocumentParams {

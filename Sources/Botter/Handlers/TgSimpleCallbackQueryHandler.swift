@@ -19,9 +19,9 @@ struct TgSimpleCallbackQueryHandler: Telegrammer.Handler {
         update.callbackQuery?.data != nil
     }
 
-    public func handle(update: Telegrammer.Update, dispatcher: Telegrammer.Dispatcher) {
+    public func handle(update: Telegrammer.Update, dispatcher: Telegrammer.Dispatcher) async {
         do {
-            try callback(update, nil)
+            try await callback(update, nil)
         } catch {
             log.error(error.logMessage)
         }
