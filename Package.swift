@@ -18,7 +18,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", from: "4.77.1"),
-        .package(url: "https://github.com/givip/Telegrammer.git", branch: "master"),
+        .package(url: "https://github.com/givip/Telegrammer.git", from: "1.0.0-alpha.3"),
         .package(url: "https://github.com/CoolONEOfficial/telegrammer-vapor-middleware.git", branch: "main"),
         .package(url: "https://github.com/CoolONEOfficial/vkontakter-vapor-middleware.git", branch: "master"),
         .package(url: "https://github.com/CoolONEOfficial/Vkontakter.git", from: "0.1.4"),
